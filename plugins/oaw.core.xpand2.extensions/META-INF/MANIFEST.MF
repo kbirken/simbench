@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: XPand2 extensions
+Bundle-SymbolicName: oaw.core.xpand2.extensions
+Bundle-Version: 0.4.2
+Require-Bundle: org.apache.commons.logging,
+ org.eclipse.cdt.formatter,
+ org.eclipse.text,
+ org.eclipse.core.runtime,
+ org.junit;resolution:=optional,
+ org.eclipse.xpand;bundle-version="0.7.0",
+ org.eclipse.emf.mwe.core;bundle-version="0.7.0"
+Bundle-Vendor: Daniel Weber
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
