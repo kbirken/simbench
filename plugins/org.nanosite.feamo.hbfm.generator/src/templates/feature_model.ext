@@ -1,0 +1,12 @@
+// extensions for FeatureModels (hbfm)
+
+import hbfm;
+
+// **********************************************************************************
+
+// get name of a SimpleFeature
+cached String name (com::harman::feamo::hbfm::SimpleFeature f) :
+	f.mandatory==null ? f.optional.name : f.mandatory.name;
+
+
+// **********************************************************************************

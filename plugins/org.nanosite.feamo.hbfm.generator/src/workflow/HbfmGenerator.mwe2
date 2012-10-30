@@ -1,0 +1,30 @@
+module workflow.HbfmGenerator
+
+import org.eclipse.emf.mwe.utils.*
+
+var outputDirectory = "src-gen/gen"
+var fileEncoding    = "UTF-8"
+var projectRoot     = "../com.harman.feamo.examples/simple"
+var modelFile       = "${projectRoot}/example_model.hbfm"
+var concept         = "ExampleFeatureModel"
+
+Workflow {
+
+    component = org.eclipse.xtext.mwe.UriBasedReader {
+    	uri = modelFile
+    	register = com.harman.feamo.HbfmStandaloneSetup{}
+    	load = {
+    		slot = "featureModels"
+    		type = "FeatureModel"
+    	}
+    }
+
+	component = org.eclipse.xpand2.Generator {
+		metaModel = org.eclipse.xtend.typesystem.emf.EmfRegistryMetaModel {}
+		expand = "templates::feature_graph::main('${concept}') FOREACH featureModels"
+		outlet = {
+			path = outputDirectory
+		}
+		fileEncoding = fileEncoding
+	}
+}

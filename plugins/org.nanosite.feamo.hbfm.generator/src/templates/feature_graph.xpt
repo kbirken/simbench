@@ -1,0 +1,86 @@
+«IMPORT com::harman::feamo::hbfm»;
+
+«EXTENSION templates::feature_model»
+
+«DEFINE main(String root) FOR FeatureModel-»
+«FILE "fm_" + name + "_dot.txt"»
+digraph feature_graph {
+	node [style=filled,fillcolor=white,shape=box,fontsize=11,fontname="Arial"];
+	splines="false";
+
+	«IF root.length > 0-»
+	root [label="«root» - «name»"];
+	«ELSE-»
+	root [label="«name»"];
+	«ENDIF-»
+	«EXPAND FeatureDetailGraph("root") FOR details-»
+	«FOREACH defs AS def-»
+	«EXPAND FeatureDetailGraph(def.feature.name) FOR def.details-»
+	«ENDFOREACH-»
+
+«IF ! constraints.isEmpty-»
+	constraints [shape=record,label="{CONSTRAINTS|«FOREACH constraints AS r ITERATOR i SEPARATOR '|'-»
+<f«i.counter0»>«r.feature1.name» «r.rel» «r.feature2.name-»«ENDFOREACH-»}"];
+«ENDIF-»
+}
+
+«ENDFILE»
+
+«FILE "draw_fm.bat"»
+@echo off
+IF "x%1"=="x" GOTO NoParam
+set dot=%1
+GOTO :HaveDot
+:NoParam
+set dot="C:\Program Files\Graphviz2.26.3\bin\dot.exe"
+:HaveDot
+
+rem generate feature graph
+%dot% -Tgif -o fm_«name».gif fm_«name»_dot.txt
+«ENDFILE»
+
+«ENDDEFINE»
+
+
+«DEFINE FeatureDetailGraph(String parent) FOR FeatureDetails-»
+«FOREACH groups AS fg ITERATOR i-»
+	«IF fg.simple!=null-»
+		«EXPAND SimpleFeatureNode(parent) FOR fg.simple-»
+	«ELSEIF fg.alt.size>0-»
+		«EXPAND SimpleFeatureNode(parent) FOREACH fg.alt-»
+		subgraph cluster_g_«parent»_«i.counter0» {
+			label="one of";
+			fontsize=9;
+			fontname=Arial;
+			style=filled;
+			color="green1";
+			fillcolor="green2";
+
+			«FOREACH fg.alt AS f-»
+			«f.name()»;
+			«ENDFOREACH-»
+		}
+	«ELSE-»
+		«EXPAND SimpleFeatureNode(parent) FOREACH fg.or-»
+		subgraph cluster_g_«parent»_«i.counter0» {
+			label="one or more";
+			fontsize=9;
+			fontname=Arial;
+			style=filled;
+			color="yellow1";
+			fillcolor="yellow2";
+
+			«FOREACH fg.or AS f-»
+			«f.name()»;
+			«ENDFOREACH-»
+		}
+	«ENDIF-»
+«ENDFOREACH»
+«ENDDEFINE»
+
+
+«DEFINE SimpleFeatureNode(String parent) FOR SimpleFeature-»
+	«name()»;
+	«parent» -> «name()» [arrowhead=«mandatory==null ? "o" : ""»dot, tailport="s", headport="n"];
+«ENDDEFINE»
+

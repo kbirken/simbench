@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<plugin>
+
+  <extension point="org.eclipse.emf.ecore.generated_package">
+    <package
+       uri = "http://www.nanosite.org/feamo/Hbfm"
+       class = "org.nanosite.feamo.hbfm.HbfmPackage"
+       genModel = "org/nanosite/feamo/Hbfm.genmodel" />
+  </extension>
+</plugin>

@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.nanosite.feamo.hbfm.generator
+Bundle-Vendor: Harman Infotainment
+Bundle-Version: 0.7.0.qualifier
+Bundle-SymbolicName: org.nanosite.feamo.hbfm.generator; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.nanosite.feamo.hbfm;visibility:=reexport,
+ org.eclipse.xpand;visibility:=reexport,
+ org.eclipse.xtend;visibility:=reexport,
+ org.eclipse.xtext;visibility:=reexport,
+ org.eclipse.emf.mwe2.launch;resolution:=optional,
+ org.eclipse.emf.mwe.utils;visibility:=reexport,
+ org.eclipse.xtend.typesystem.emf;visibility:=reexport,
+ org.eclipse.ui.console;bundle-version="3.5.0",
+ org.eclipse.core.runtime;bundle-version="3.6.0",
+ org.eclipse.jface;bundle-version="3.6.0",
+ org.eclipse.core.resources;bundle-version="3.6.0",
+ org.eclipse.ui;bundle-version="3.6.0",
+ org.nanosite.common.util
+Import-Package: org.nanosite.common.util.graphviz,
+ org.apache.log4j
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

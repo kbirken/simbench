@@ -1,0 +1,32 @@
+/*
+ * This is an example model
+ */
+
+// ***************************************************************************
+
+feature_model flowgraph {
+	// concept features
+	project usecase [scope];
+	
+	// feature details
+	project: (NTG5 | NBT);
+
+	usecase: (Normal | Startup | Unlock | Diag);
+	
+	scope: (RealSystem | TestSetup);
+	TestSetup: (CANTest + MOSTTest + PingPongTest + TunerTest);
+	
+	// restrictions
+	MOSTTest excludes PingPongTest;
+	PingPongTest requires NTG5;
+}
+
+
+// ***************************************************************************
+
+configuration Example for flowgraph {
+	MOSTTest + CANTest 
+}
+
+
+// ***************************************************************************

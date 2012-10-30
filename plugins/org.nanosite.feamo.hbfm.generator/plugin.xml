@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            objectClass="org.eclipse.core.resources.IFile"
+            nameFilter="*.hbfm"
+            id="com.harman.feamo.ui.actions.contribution1">
+         <action
+               class="com.harman.feamo.hbfm.generator.ui.GenerateFeatureDiagram"
+               enablesFor="1"
+               id="com.harman.simbench.ide.actions.featureDiagramAction"
+               label="Generate feature diagram"
+               menubarPath="com.harman.feamo.ui.feamoMenu/group1">
+         </action>
+      </objectContribution>
+   </extension>
+
+</plugin>

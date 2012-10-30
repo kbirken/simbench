@@ -1,0 +1,32 @@
+<workflow>
+   <!--
+   <property file="workflow/test_hbsim.properties" />
+   -->
+
+   <!-- The model file -->
+   <property name="modelFile"/>
+
+   <!-- Where to put generated files -->
+   <property name="srcGenPathAbs"/>
+   <property name="srcGenPathRel"/>
+
+   <!-- Root concept of feature diagram -->
+   <property name="rootConcept"/>
+
+	<bean class="org.eclipse.emf.mwe.utils.StandaloneSetup" platformUri=".."/>
+
+	<!--
+	<component class="org.eclipse.emf.mwe.utils.DirectoryCleaner" directory="src-gen"/>
+	-->
+
+	<component class="org.eclipse.xtext.MweReader" uri="${modelFile}">
+		<register class="com.harman.feamo.HbfmStandaloneSetup"/>
+	</component>
+
+	<component class="org.eclipse.xpand2.Generator">
+		<metaModel class="org.eclipse.xtend.typesystem.emf.EmfRegistryMetaModel"/>
+		<fileEncoding value="Cp1252"/>
+		<expand value="templates::feature_graphs::main('${rootConcept}') FOR model"/>
+		<outlet path="${srcGenPathAbs}/" />
+	</component>
+</workflow>

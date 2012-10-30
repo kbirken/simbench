@@ -1,0 +1,9 @@
+«IMPORT com::harman::feamo::hbfm»;
+
+«EXTENSION templates::feature_model»
+
+«DEFINE main(String root) FOR Model-»
+«EXPAND templates::feature_graph::main(root) FOREACH this.featureModels»
+«ENDDEFINE»
+
+

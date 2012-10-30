@@ -1,0 +1,22 @@
+<project name="feamo language definition project" default="generate" basedir="..">
+   <target name="generate">
+   	<!-- see http://blogs.itemis.de/feltes/2010/07/02/how-to-run-xtext-and-other-mwe2-workflows-with-ant/ -->
+   	<path id="mwe2.classpath">
+   		<!-- In order to avoid having to runa  build prior to generation,
+   		     just add src to the classpath when running the workflow.
+   		     Keep this on top to avoid using an older workflow version from bin/
+         -->
+   		<pathelement location="src"/>
+   		<buckminster.valuepath value="${fs:project.classpath}"/>
+   	</path>
+   	<java classname="org.eclipse.emf.mwe2.launch.runtime.Mwe2Launcher"
+          classpathref="mwe2.classpath"
+          fork="true"
+      	 dir="${basedir}">
+   		 <arg value="src/com/harman/feamo/GenerateHbfm.mwe2"/>
+   		 <jvmarg value="-Xmx512M"/>
+   	</java>
+   	<!-- Refresh whole workspace after generate -->
+   	<eclipse.refreshLocal resource="/" depth="infinite"/>
+   </target>
+</project>
