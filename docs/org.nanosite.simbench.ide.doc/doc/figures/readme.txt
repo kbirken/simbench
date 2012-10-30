@@ -1,0 +1,1 @@
+This directory contains the figures and diagrams for the SIMBENCH documentation.

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cspecExtension
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:bc="http://www.eclipse.org/buckminster/Common-1.0"
+	xmlns="http://www.eclipse.org/buckminster/CSpec-1.0">
+	<actions>
+		<!-- Place your Actions here -->
+		<public name="documentation" actor="jdt.ant">
+		 <actorProperties>
+		    <property key="targets" value="generate-help"/>
+		    <property key="buildFile" value="ant/doc.ant"/>
+		 </actorProperties>
+		</public>
+	</actions>
+</cspecExtension>

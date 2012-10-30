@@ -1,0 +1,75 @@
+<project name="doc" default="generate-help">
+
+	<property name="doc.project.dir" value="${basedir}"/>
+	<property name="doc.dir" value="${doc.project.dir}/doc"/>
+	<property name="doc.gen.dir" value="${doc.project.dir}/doc-gen"/>
+	<property name="doc.dir.outside" value="${doc.project.dir}/../../../doc"/>
+
+	<!-- path to wikitext standalone package -->
+   <property name="wikitext.standalone" value="${doc.project.dir}/lib"/>
+
+	<path id="wikitext.classpath">
+	   <fileset dir="${wikitext.standalone}">
+	      <include name="org.eclipse.mylyn.wikitext.*core*.jar"/>
+	   </fileset>
+	</path>
+
+	<taskdef classpathref="wikitext.classpath" resource="org/eclipse/mylyn/wikitext/core/util/anttask/tasks.properties" />
+
+   <target name="generate-help" depends="clean">
+   	<exec executable="cmd" dir="${doc.project.dir}">
+   		<env key="JAVA_HOME" value="${java.home}"/>
+   		<env key="ANT_HOME" value="${ant.home}"/>
+   		<env key="PATH" value="${java.home}/bin;${ant.home}/bin"/>
+   		<arg value="/c"/>
+   		<arg value="ant.bat"/>
+   		<arg value="-Dbasedir=${doc.project.dir}"/>
+   		<arg value="-buildfile"/>
+   		<arg value="ant/doc.ant"/>
+   	   <arg value="do-generate-help"/>
+      </exec>
+   </target>
+
+	<target name="clean">
+      <delete dir="${doc.gen.dir}"/>
+	</target>
+
+
+	<target name="do-generate-help" description="Generate Eclipse help from Textile sources" depends="assemble">
+   	<wikitext-to-eclipse-help
+      	title="SIMBENCH User's Guide"
+      	markupLanguage="Textile"
+      	formatoutput="true"
+         multipleOutputFiles="true"
+         navigationImages="false"
+         helpPrefix="doc-gen">
+         <fileset dir="${doc.gen.dir}" includes="*.textile"/>
+         <stylesheet url="book.css"/>
+      	<!--
+         <stylesheet url="styles/help.css"/>
+         <stylesheet url="styles/main.css"/>
+         -->
+      </wikitext-to-eclipse-help>
+   </target>
+
+   <target name="assemble">
+   	<mkdir dir="${doc.gen.dir}"/>
+      <copy todir="${doc.gen.dir}/figures">
+      	<fileset dir="${doc.dir}/figures"></fileset>
+      </copy>
+      <copy todir="${doc.gen.dir}/">
+      	<fileset file="${doc.dir}/book.css"></fileset>
+      </copy>
+      <loadfile srcfile="${doc.dir}/simbench-index.txt" property="inputfiles">
+        <filterchain>
+         <tokenfilter>
+             <replacestring from="\n" to=","/>
+         </tokenfilter>
+        </filterchain>
+      </loadfile>
+      <concat destfile="${doc.gen.dir}${file.separator}simbench.textile" append="false" fixlastline="yes">
+         <filelist dir="${doc.dir}" files="${inputfiles}"/>
+      </concat>
+   </target>
+
+</project>

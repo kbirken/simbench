@@ -1,0 +1,12 @@
+h1. General Information
+
+SIMBENCH is a modeling and simulation tool environment. Systems consisting of software blocks and hardware resources can be modeled. As there is a strong focus on modeling of dynamic behaviour, the models can be executed using simulation tools. The models can contain arbitrary variants expressed and configured by a feature model.
+
+Should you find any problems or have a suggestion how we could improve SIMBENCH, please file a "new ticket":":http://trac.harmanbecker.com:9000/SIMBENCH/newticket in the "SIMBENCH Trac project":http://trac.harmanbecker.com:9000/SIMBENCH/.
+
+There is a "Hudson":http://hudson-ci.org/ server which continuously builds and tests the SIMBENCH java sources and creates new installation packages after every change (only if the tests succeeded). The project relevant to SIMBENCH user is called "SIMBENCH":http://oekat0009.hbi.ad.harman.com/job/SIMBENCH/.
+
+h2. Where do I get it?
+
+# Download the latest distribution from the corresponding Hudson project: "http://oekat0009.hbi.ad.harman.com/job/arch-simbench-updates/lastSuccessfulBuild/artifact/buckminster.output/Simbench-win32.win32.x86.zip":http://oekat0009.hbi.ad.harman.com/job/arch-simbench-updates/lastSuccessfulBuild/artifact/buckminster.output/Simbench-win32.win32.x86.zip
+# Unzip it and run @Simbench-win32.win32.x86\eclipse.exe@. This will launch the SIMBENCH IDE.

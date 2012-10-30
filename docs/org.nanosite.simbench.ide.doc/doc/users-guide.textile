@@ -1,0 +1,63 @@
+h1. SIMBENCH User's Guide
+
+The scope of this User's Guide is the usage of the SIMBENCH IDE. It describes the SIMBENCH-specific editors, views and menu items. It also gives some backgrounds of specific SIMBENCH-features.
+
+h2. Editing hbsim files
+
+h3. The hbsim-editor
+
+The figure below shows the SIMBENCH Editor in the SIMBENCH Perspective.
+
+!figures/MIDEditor.png!
+
+h3. Features of the hbsim-editor
+
+
+h3. Keyboard shortcuts in hbsim-editor
+
+h4. To get a drop down box with valid elements
+
+Short cut: [CTRL] [SPACE]
+!figures/CtrlSpace.png!
+
+h4. Quick fix
+
+Use: on error messages
+!figures/QuickFix.png!
+
+Short cut: [CTRL] 1
+!figures/DsiNotification.png!
+
+h4. Jump to definition/declaration
+
+Short cut: F3
+
+h4. Comment/ uncomment
+
+Short cut: [CTRL] 7
+
+h4. Jump to last change in code
+
+Short cut: [CTRL] Q
+
+h4. Jump to previous opened file
+
+Short cut: [ALT] [LEFT]
+
+h4. Jump back from previous File
+
+Short cut: [ALT] [RIGHT]
+
+h4. Move current line or selected lines up/down
+
+Short cut: [ALT] [UP]
+Short cut: [ALT] [DOWN]
+
+h4. Clone current/selected line(s)
+
+Short cut: [CTRL] [ALT] [DOWN]
+Short cut: [CTRL] [ALT] [UP]
+
+
+h2. Starting a simulation
+

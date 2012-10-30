@@ -1,0 +1,422 @@
+h1. Hbsim language reference
+
+The _hbsim_ domain-specific language provides the vocabulary for modeling the structure and dynamic behavior of distributed embedded systems, e.g. Automotive/Infotainment systems. This document describes the complete _hbsim_ language.
+
+
+h2. Overall structure of hbsim models
+
+A _hbsim_ model can be distributed over multiple files. Each file consists of a set of @import@-statements, an optional reference to some feature model and a list of various model elements.
+
+h3. Conceptual structure of models
+
+Each model has a _layered_ structure. The layers do not appear explicitly in the _hbsim_ files, but offer a conceptual super-structure which guides you through a model. All model elements of one layer will only refer to model elements which are either in the same layer or in underlying layers. The following list explains those layers from top to bottom:
+* _Root layer_
+** This layer consists of exactly one @main@-section, which is the root of the _hbsim_ model. It refers to the following three elements:
+*** a reference to a @partitioning@ from the configuration layer.
+*** a reference to a @scenario@ from the configuration layer.
+*** a reference to a @configuration@ from the configuration layer.
+** By choosing exactly one instance of each of those three elements, the model is configured from basic building blocks.
+* _Configuration layer_
+** This layer may contain several elements of type @partitioning@, @scenario@ and @configuration@ (but at least one of each).
+** From the root layer the model is configured by selecting one element of each type.
+** @partitioning@-elements define which functional block is mapped to which CPU.
+*** This answers the question: _What runs where?_
+*** @partitioning@-elements refer to functional blocks located in the _functional layer_.
+** @scenario@-elements define which use-cases will be combined to trigger the dynamic execution of model on the simulator.
+*** This answers the question: _Which behavior should be triggered?_
+*** @scenario@-elements refer to @usecase@-elements (which are also part of the configuration layer).
+** @configuration@-elements choose a consistent set of features from the underlying feature model.
+*** This answers the question: _Which variant of the model is active?_
+*** @configuration@-elements only refer to feature definitions from the _feature layer_.
+*** Each @configuration@-element might be derived from another @configuration@-element. Thus, there might be a chain or tree of @configuration@-elements.
+* _Functional layer_
+** This layer contains the definition of all _functional blocks_ of the model (starting with keyword @fb@).
+** Each @fb@-section specifies all possible dynamic behaviors of a functional block, together with some additional information like documentation and references to real entities in the target system (e.g., process names).
+** The @fb@-sections in the functional layer will referencing each other in order to express dependencies (e.g., preconditions, _uses_-relations, _triggers_-relations).
+** An @fb@-section might also refer to elements of the underlying _resource layer_ in order to express usage of bandwidth-limited and alloc/free resources.
+* _Resource layer_
+** This layer contains the definition of CPUs, bandwidth-limited resources and alloc/free resources. Thus, it basically defines the _hardware_ which is available for executing the _functional blocks_.
+** CPUs are defined by the keyword @cpu@.
+** Bandwidth-limited resources are defined by the keyword @resource@.
+** Alloc/free resources are defined by the keyword @pool@.
+* _Feature layer_
+** This layer contains exactly one instance of type @feature_model@. This element describes a hierarchical _feature model_.
+** It is not defined with _hbsim_ file format, but with the _hbfm_ file format instead.
+** The feature model used by a _hbsim_ model has to be imported by the _hbsim_ files using the @import@-statement.
+
+Usually, the model is split across multiple files. As a general guideline, it is helpful if no _hbsim_ file contains elements of more than one layer in order to emphasize the conceptual layering structure. The following sections in this language reference will describe all terms and elements mentioned above in more detail.
+
+
+h2. Overall structure of hbsim files
+
+This section lists the general contents of an _hbsim_ file, in the same order as they appear in the file.
+
+h3. Importing other model files
+
+Each file starts with a set of @import@-statements, which are used to reference additional model files. Usually, these files contain model elements which are referenced later on in this file. According to the layer structure defined above, the referenced files will contain model elements which are either in the same conceptual layer or in one of the underlying layers. Example of an @import@-statement:
+
+bc. import "platform:/resource/Project/src/model/arm7.hbsim";
+
+The imported file is referenced by a standard URI (i.e., Uniform Resource Identifier); its syntax is determined by the URI types supported by EMF. Examples are @file:@-URIs used for referencing files in the filesystem and @platform:@-URIs used for referencing files in the Eclipse workspace (i.e., projects in SIMBENCH's Package Explorer. The Eclipse workbench will try to resolve the URIs and validation errors will show up if the imported file cannot be found.
+
+h3. Feature model reference
+
+The _hbsim_ language supports powerful variant handling, which allows to create a generic model and select specific instances of that model by creating configurations from predefined feature sets. In order to use this technology, features have to be referenced from various spots inside the model. All of those features have to be defined in a _feature model_, which is defined in a _hbfm_-file. _hbfm_ is a separate domain-specific language (DSL).
+
+In each _hbsim_ model file which needs to reference features from a feature model, this feature model has to be referenced by a @ref@ statement, which is located between the list of @import@-statements and the remainder of the file. Example:
+
+bc. // reference feature model of product variants
+ref ProductVariantsModel;
+
+Note that in order to reference the feature model, an @import@-statement should have been given earlier which imports the corresponding _hbfm_-file which defines the feature model.
+
+h3. Model object definitions
+
+The next section of the _hbsim_-file contains a list of model element definitions in arbitrary order. E.g., these include variable definitions, CPUs, controllers, resources, functional blocks, use cases and many more. The definition of these model elements is described in the remainder of this chapter.
+
+h3. Configurations and main section
+
+In the last section, zero or more _configurations_ can be specified. A _configuration_ (defined by the keyword @configuration@) is a selection of features from the feature model, which defines a specific instance of the actual simulation model. Several configurations can be defined, for concrete actions (generation of model visualizations, running a simulation), one of the configurations must be chosen.
+
+A detailed description of feature models and configurations will be given later in this document (cf. section +Features, feature selectors and configurations+).
+
+Finally, a _hbsim_-file may contain a @main@-section, which instantiates a concrete model from various model elements. The @main@-section will be explained in more detail in chapter +Main section+ later in this document.
+
+
+h2. Features, feature selectors and configurations
+
+This section describes the _feature layer_ of _hbsim_ models in some detail.
+
+h3. Feature model definition
+
+A _feature model_ is a compact definition of features, their relationships and interdependencies. For _hbsim_ models, various model elements (and language constructs) can be defined as dependent on features of a central feature model. The feature model will be defined in a separate file in _hbfm_ format.
+
+A _hbfm_ file will contain one single instance of a @feature_model@ element. The syntax is defined by
+
+pre. FeatureModel:
+  'feature_model' IDENT '{'
+    FeatureDetails* ';'
+    FeatureDefinition*
+    Constraint*
+  '}'
+
+_FeatureDetails_ is a list of feature identifiers. A _FeatureDefinition_ gives a detailed specification for a feature identifier. As _FeatureDefinition_ might introduce new feature identifiers, which can themselves be detailed by another _FeatureDefinition_, the overall feature model forms a tree of features. The nodes of this tree might indicate 1-of-n or n-of-m relationships. The top-most features (right below root) are defined by the _FeatureDetails_ list above and are commonly called _concept features_. Finally, the list of _Constraint_ elements allows to define interdependencies between features (i.e., one relation of @excludes@ or @requires@ for a pair of features.
+
+The following examples shows a simple feature model definition:
+
+bc.. feature_model MyFeatureModel {
+  // *** concept features
+  Component Level Market Options;
+
+  // *** feature definitions
+  Component:     (HeadUnit | RearSeatUnit);
+  Level:         (Entry | Mid | High);
+  Market:        (EUR | USA | ASIA | ROW);
+  Options:       [HasTouchscreen];
+
+  // *** constraints
+  USA requires HasTouchscreen;
+  ROW excludes RearSeatUnit;
+}
+p. In this example feature model, there are four concept features. The first three concept features @Component@, @Level@ and @Market@ are _alternatives_. I.e., exactly one of the sub-features must be selected. The feature @Options@ has one sub-feature @HasTouchscreen@, which is optional (indicated by square brackets).
+
+h3. Feature configuration
+
+A _feature configuration_ selects a consistent set of features from a feature model. For each feature model, a possibly large set of configurations may be selected. Example: Many car manufacturers offer _car configurators_ on their website, where customers may configure the car of their dreams by selecting various variants, options and add-ons in an easy-to-use web interface.
+
+In _hbsim_ models, configurations can be defined with the @configuration@ keyword. Each configuration might be derived from a base configuration, which offers a simple inheritance mechanism. Features can be added to or removed from a configuration with the plus- and minus-sign, respectively. Here is an example based on the above feature model:
+
+bc.. configuration MyBaseConfig {
+  +HeadUnit
+  +High
+  +EUR
+}
+
+configuration ExtendedConfig extends MyBaseConfig {
+  +HasTouchScreen
+}
+p. Note: The consistency of configurations is currently not checked by the SIMBENCH IDE. The developer is responsible for putting together consistent configurations. An extended validation might be added in a later version of SIMBENCH.
+
+h3. Feature selectors
+
+Feature selectors are boolean expressions built from feature identifiers, enclosed in colons. The most simple feature selector is just a single feature identifier:
+
+bc. :ASIA:
+
+Feature selectors may be specified at various locations in the model's syntax tree, offering a means to specify model variants depending on conditions built from a set of features. E.g., the following example specifies a cpu clock rate depending on the optimization feature @HaveFastCPU@:
+
+bc. :HaveFastCPU:  500.0
+:!HaveFastCPU: 250.0
+
+Using boolean expressions, more complex conditions can be defined. E.g., the following example defines a condition which is true only if the configuration section selects @ASIA@ and not @HaveFastCPU@:
+
+bc. :ASIA&(!HaveFastCPU):
+
+Note: Currently, there is no complete consistency checking of feature selectors in SIMBENCH. I.e., the model designer is responsible for avoiding a logical overlap in the conditions of parallel feature selectors. If the conditions overlap, the result is undefined without any further notice.
+
+
+h2. Constant definitions
+
+In _hbsim_, named constants can be defined using the @set@ keyword. Example:
+
+bc. set CPU_CLOCK_RATE = 1300 * 0.8;
+
+By convention, constant identifiers should be uppercase with underscores. The right-hand-side expression might be a plain numerical constant, or any arithmetic expression with usual operators based on float values. These expressions might also contain named constants which have been defined before.
+
+The right-hand-side expression of a constant definition might be specified using feature selectors. Example:
+
+bc. set CPU_CLOCK_RATE =
+     :HaveFastCPU:  500.0
+     :!HaveFastCPU: 250.0;
+
+
+h2. Resource layer: CPUs and resources
+
+This section describes the model elements which are part of the _resource layer_. These elements basically define the hardware foundation of the system being modeled, i.e., controllers and other resources.
+
+h3. Controllers and CPUs
+
+CPUs are the basic building blocks of the resource layer in each _hbsim_ model. Functional blocks will be executed on one of the CPUs defined in the model. The actual mapping of functional blocks on CPUs is defined by a _partitioning_.
+
+h4. Simple CPU definition
+
+Controllers and CPUs can be specified using the 'cpu' keyword. For a minimal @cpu@ definition, just the name of the controller and the number of cores have to be specified. Here is a simple example:
+
+bc. cpu ARM7 {
+  cores 1;
+}
+
+*{color:red}TODO*: Describe impact of @cores@ definition on simulation results.
+
+h4. Mapping of CPU power between controllers
+
+Many systems consist of multiple controllers. In those systems, it is helpful to relate the CPU power of all available controllers to one standardized CPU. This allows to transform CPU-seconds given for one controller to another controller by computing a conversion factor from one CPU to another. The conversion factor from CPU seconds to the normalized CPU seconds can be specified with the optional @normalizer@ keyword:
+
+bc.. cpu ARM7 {
+  cores 1;
+
+  // this cpu is our standard CPU by definition
+  normalizer 1.0;
+}
+
+cpu ARM9 {
+  cores 1;
+
+  // this cpu is twice faster than the standard CPU
+  normalizer 2.0;
+}
+p. In general, the conversion of CPU power by applying linear factors will not be exact at all due to aspects like memory bandwidths, caches, etc. However, the accuracy of the simulations will be quite sufficient as long as those impacts do not result in a extreme non-linear behaviour.
+
+h4. Information for trace analysis tools
+
+For linking the simulation model with trace analysis tools, it is important to find the proper CPU definition in the model according to some tag in the real-world trace. This tag can be specified by the optional @machine@ keyword. Example:
+
+bc.. cpu ARM7 {
+  cores 1;
+
+  /* x86 is the identifier which can be found
+     in the trace output of this cpu  */
+  machine x86;
+}
+p. The actual tag can be chosen freely (but has to adhere to the identifier syntax).
+
+h4. Specification of scheduling aspects
+
+There are some optional _hbsim_ elements which are used to specify scheduling aspects for a CPU definition. Currently, either plain schedulers or adaptive-partitioning schedulers are supported (see QNX APS to get more information on this). Scheduling is specified using the optional @scheduling@ keyword. Here is a simple example:
+
+bc.. cpu SomeCPU {
+  cores 1;
+
+  // we are using an APS scheduling here
+  scheduling aps;
+
+  // the detailed APS scheduling configuration
+  partitions {
+    system: 10
+    audio:  30
+    tuner:  30
+    hmi:    30
+  }
+}
+p. The numbers are given as CPU percentages. The user is responsible for specifying an overall percentage of 100. The actual percentage values might be specified using feature selectors.
+
+*{color:red}TODO*: Describe impact of @scheduling aps@ definition on simulation results.
+
+h3. System resources
+
+There are two kinds of resources which can be accessed by functional blocks:
+* bandwidth-restricted resources (e.g., hard-disk, Flash memory)
+* allocator-style resources (e.g., main memory, communication channels)
+
+h4. Bandwidth-restricted resources
+
+Bandwidth-restricted resources are defined by the _hbsim_ element @resource@. Aside from the resource's name, there are some mandatory configuration attributes and one or more @interface@ definitions. Consider the following example:
+
+bc.. resource SomeResource {
+  short Res1;
+  unit "MB";
+  blocksize 16;
+
+  interface standard {
+    bandwidth 10.0;
+    inducedCPU 10;
+    cst 20;
+  };
+
+  // put more interfaces here
+}
+p. The @resource@ with name _SomeResource_ is defined in the example. For some trace output and code generation a short name will be needed, which is specified by the attribute @short Res1@. The attribute @unit@ defines the unit for the amount of data (e.g., for specifying an actual bandwidth). The simulation scheduler will split actual read requests into smaller, equal-sized chunks. Those chunks will be the smallest part handled by the simulated scheduler for this resource. The @blocksize@ attribute gives the size of these chunks in kilobytes (@16@ kByte is a reasonable value and should not be changed).
+
+After these general attributes, one or more @interface@ sections should be defined. Each @interface@ section will have a name (@standard@ in the example), which is used to identify the interface when specifying read requests. The following parameters have to be defined for each interface:
+* @bandwidth@: The maximum bandwidth in units/second, valid for read accesses to this resource via this interface. In the example 10 MB/sec have been specified.
+* @inducedCPU@: The percentage of CPU power which is used when accessing the resource via this interface. This simulates the CPU resources needed for hardware abstraction and driver stack for the resource. In the example, a value of 10% has been defined.
+* @cst@: Short for _context switching time_. This is a penalty factor for concurrent access to the resource. It specifies the percentage of time which will be added to the theoretical time for the read request. In the example, the context switching time has been defined as 20%, which means that each read request will be 20% longer when more than one client accesses the resource.
+
+The parameters of @interface standard@ in the example would lead to the following scenarios:
+* If just one client reads 20 MB from the resource via the interface, this would take two seconds. During that time period the CPU would have an additional load of 10%. There is no @cst@ penality, because only one client accesses the resource.
+* If two clients read 10 MB each from the resource at the same time, each of them would get roughly half of the available bandwidth. Additionally, there will be a @cst@ penalty of 20% for both accesses. This leads to an overall time of 2.4 seconds until both read requests are finished. During these 2.4 seconds, the CPU will have an additional load of 10%.
+* In both scenarios: If the CPU is already fully loaded and the additional load induced by the read operation is not available, this will lead to delays for the overall read operation. The amount of these delays depends on the number of concurrent running functional blocks which are active on the CPU.
+
+The @inducedCPU@ time will always be accounted to the CPU where the client of the resource is located. It is the responsibility of the model designer to access the resource only from those CPUs which have a physical connection to the resource.
+
+Currently, access to the resource does not distinguish read and write operations. In order to model and simulate different behavior for read and write, separate interfaces must be defined. The access operations offer both @read@ and @write@ keywords, but this is for documentation only. The real simulated behavior of these operations depends solely on the resource's interface.
+
+
+h4. Allocator-style resources
+
+Allocator-style resources are defined by the _hbsim_ element @pool@. A _pool_ contains a discrete number of entities (e.g., memory pages, communication channels), which can be allocated or freed by functional blocks. The following example shows the syntax of @pool@ definitions:
+
+bc.. pool SomePool {
+  unit = "MB";
+  maximum = 1024;
+}
+p. Aside from the name of the @pool@, the following attributes have to be specified:
+* @unit@: This attribute defines the unit for the entities in the pool (e.g., for specifying the pool size and the sizes of allocate/free operations).
+* @maximum@: This attribute defines the pool size, which is the maximum amount of entities which can be allocated from the pool.
+
+The above example specifies some kind of memory, which is available in Megabyte chunks and has a size of 1024 MB.
+
+
+h2. Functional layer
+
+h3. Simple functional blocks and behaviors
+
+A _functional block_ in _hbsim_ is an entity with defined runtime behavior. It can be regarded as an abstraction of a modular piece of software ranging from single software components up to complete subsystems. The definition of a functional block starts with the keyword @fb@, followed by the block's name.
+
+Each functional block has to define at least one _behaviour_, which is a step-by-step description of the functional block's execution behavior in a certain use case or scenario. Each behavior definition is indicated by the keyword @on@, followed by the behavior's name. Each behavior consists of a series of _steps_ (which might be empty).
+
+The following example shows a simple functional block with just one behavior.
+
+bc.. fb SomeComponent {
+  on load() {
+    step1 {
+      use 300;
+    }
+    step2 {
+      use 700;
+    }
+  }
+}
+p. In the example, the functional block @SomeComponent@ has a single behavior @load()@, which consists of two steps @step1@ and @step2@. As soon as the behavior @load()@ is triggered from outside (either by starting a proper _use case_ or by receiving a _trigger_ from another functional block), the two steps will be executed one after another. After @step2@ has been completed, the behavior will end and the functional block @SomeComponent@ is idle.
+
+h3. What can be specified in a behavior's step?
+
+For each step in a behavior, there are various possibilities of defining the _actions_ being executed during the step. All actions are optional and can be combined freely. However, the order of actions is defined as in the following table:
+|_. Keyword          |_. Action |_. Example |_. Description |
+| @use@             | use CPU power                 | @use 200@ | Specifies the CPU time used for completing this step. The time is given in milliseconds of local CPU-time. More options are specified below. |
+| @wait@            | wait (e.g., for external HW)  | @wait 1000@ | Specifies the minimum amount of wall-clock time needed for completing this step. For the interaction with @use@ please see below.  |
+| @read@ / @write@ | access bandwidth resource     | @read data: 0.5 via SomeResource.someIf@ | Read 0.5 units of data from a resource's interface. |
+| @alloc@           | alloc from pool resource      | @alloc SomePool: 32@ | Allocate a given number of entities from a given pool resource. |
+| @free@            | free from pool resource       | @free SomePool: 32@ | Free a previously allocated number of pool entities. |
+
+If @use@ and @wait@ are combined in one step, there are the following cases:
+* @use@ >= @wait@: As the CPU will have to work more time than the specified wait time, there will be no additional wait time (@wait@ will be "hidden").
+* @use@ < @wait@: If the additional load on the CPU is high, the @wait@ time will be hidden (as in previous case). If the CPU is idle except from the current step, the @use@-time will fit into @wait@ time.
+* @use@ << @wait@: The step will take at minimum the time given by @wait@ -- the CPU activity defined by @use@ will be spread across the @wait@ time as equally as possible. This is the typical way of modeling a _polling_ mechanism.
+
+The @use@-action offers some more options, which will be described in the following sections.
+
+h4. Automatic transformation of CPU-times between CPUs
+
+By default the parameter for @use@ gives the computed time in milliseconds based on the local CPU. If the time has been measured on a different platform than the platform where the functional block is currently running, _hbsim_ offers a facility to transform the computed time between platforms. The @use@ statement might refer to another @cpu@-entity to indicate that the timing is given related to this entity by using the @on@ keyword:
+
+bc. use 500 on ARM9
+
+If the functional block is deployed to the @ARM7@ CPU, the CPU-usage time of @500@ in the above example will be converted from @ARM9@ time to @ARM7@ time according to the factors given by the @normalizer@ keyword in the corresponding @cpu@-definitions.
+
+h4. Support for multi-core and hyper-threading
+
+If the functional block is running on a multi-core CPU, each step of its behaviors might be executed in parallel on all cores. However, the amount of available parallelism of a certain step might be limited. The wall-clock time needed to complete the actual work indicated by a @use@-action will depend on the amount of parallelism. Therefore, a @maxpar@ attribute can be added to the @use@-statement in order to specify the maximum amount of cores (or hyper-threads) which can be utilized by this step. Example:
+
+bc. use 500 maxpar 4
+
+This definition indicates that the 500 milliseconds CPU workload can be distributed equally up to a maximum of four 125 millisecond parts. The actual distribution depends on the available number of cores of the local CPU.
+
+Note: The current simulation backends (chronSIM and warp) will not use this information yet. This will be supported n a future version of SIMBENCH. Currently, the speed-up due to parallelization has to be applied as an average factor using the @normalizer@ factor of the @cpu@ entities.
+
+
+h3. Accessing resources from functional blocks
+
+The following example shows how to access resources from a functional block:
+
+bc.. fb SomeComponent {
+  on doSomething() {
+    step1 {
+      read file1: 12.5 via Harddisk.compressed;
+      alloc MainMemory : 20;
+    }
+  }
+}
+p. The example shows a behavior with only one step. In this step, a 12.5 MB file is read from the hard-disk. The name of the resource's interface @compressed@ indicates that the data in the file is compressed. At the same time, 20 MB are allocated in main memory (i.e. in order to store the uncompressed file contents). The name of the data file (here: @file1@) is for documentation purposes only. There might be an arbitrary number of @read@, @write@, @alloc@ or @free@ actions in each step. The step will be finished (aka _reached_) after all actions of this step are accomplished.
+
+
+h3. Dependencies between functional blocks: preconditions
+
+*{color:red}TODO*: Describe how to define preconditions and what do they refer to.
+
+h3. Dependencies between functional blocks: triggers
+
+*{color:red}TODO*: Describe how triggers are being sent and received.
+
+h3. Additional options for behaviors' steps
+
+*{color:red}TODO*: Describe @provides@, @internal_milestone@, @customer_milestone@.
+
+h3. Extended control structures for behaviors
+
+*{color:red}TODO*: Describe taskgroups, @repeat@ / @until@ / @unless@, tokens.
+
+h3. Linking a functional block to a real-world entity
+
+*{color:red}TODO*: Describe how functional blocks can be linked to real-world processes and traces by @processes@ and @marker@.
+
+
+h2. Configuration layer
+
+h3. Partitionings: What runs where?
+
+*{color:red}TODO*: Describe @partioning@ including inheritance.
+
+
+h3. Use cases and scenarios
+
+*{color:red}TODO*: Describe @usecase@ and @scenario@.
+
+h3. Configurations
+
+Configurations can be used to define combinations of features from the underlying feature model. Configurations can be based on each other (inheritance relationship); this allows building chains of configurations (e.g., the sequence of release versions of an infotainment product). Across the configuration chain, features might be switched on or off.
+
+See section _Feature configuration_ above for more details on how to specify configurations.
+
+
+h2. Root layer: the main section
+
+The _root layer_ consists of one single @main@ entity. Here is an example:
+
+bc.. main {
+	partitioning StandardDeployment;
+	scenario AggressiveLoadTest;
+	configuration ReleaseConfiguration;
+}
+p. This @main@-entity connects the three aspects of a simulation model: mapping of functional blocks to CPUs (i.e., partitioning), scenario to be executed and model configuration. By selecting all three among a library of possibilities, various combinations of models and simulations can be tested. All entities from this library are part of the model's _configuration layer_.
+

@@ -1,0 +1,5 @@
+h1. FAQ - Frequently Asked Questions
+
+h2. How can I update my SIMBENCH IDE
+
+Just run Help -> Check for Updates. Eclipse should detect if there are any updates and take it from there.

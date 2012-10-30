@@ -1,0 +1,36 @@
+h1. SIMBENCH IDE Usage
+
+This page gives a short overview of the main editors and views of the SIMBENCH IDE and their corresponding mouse and keyboard features. More documentation will be provided soon - especially documentation about the hbsim language and the various generators will be provided.
+
+h2. General info about SIMBENCH IDE
+
+The SIMBENCH IDE is an Eclipse-based application (Eclipse Helios with Xtext 1.0.1). It contains all plugins necessary for working with the set of domain-specific languages hbsim, hbfm and hbinj. There is a SIMBENCH-perspective which defines the views and editors which should be used and their default location inside the IDE.
+
+* The standard **Project Explorer** view of Eclipse can be used to navigate the project code.
+* As part of the SIMBENCH IDE, the Perforce plugin has been integrated. Use **Window** -> **Show View** -> **Other...** and select one of the Perforce views for using this. This is very useful, because files will be checked out for edit automatically on first change in a Eclipse editor.
+** Use **P4 Connections** to define a connection to some Perforce client.
+** Use the context menu item **Team** -> **Share project** on a project in the Project Explorer in order to connect some project in the workspace with a Perforce client.
+** Use the **P4 Pending Changelists** view to show the currently opened files.
+* Also Mylyn can be used, which is a tool for integration with bug tracking systems and management of work contexts (currently opened files).
+
+
+h2.  hbsim Editor
+
+The hbsim editor is the main tool for the modeler. It edits hbsim-files, i.e., the actual simulation model parts. The hbsim DSL will be documented separately.
+
+Usage features of the SIMBENCH editor:
+
+* The usual features of Eclipse editors apply, among them:
+** undo/redo
+** folding (light blue circles with minus or plus signs inside)
+** comment/uncomment the marked code section by CTRL-7
+* Use CTRL-SPACE anywhere to get SIMBENCH-specific content assist.
+* Validation errors are shown if syntax on semantics issues exist. Validation errors are red circles with a white cross in it (as usual with Eclipse code editors). Validation errors must be cleaned up before code generation can be started.
+* Validation warnings (yellow triangles) shouldn't be ignored either.
+* Jump to definition/declaration by clicking on an item in the editor and pressing F3. This even works across languages (F3 after clicking on a feature name will jump to the corresponding hbfm file).
+* For some validation errors, quick fixes are available. Click in the line where the error is located, press CTRL-1. This opens the quick fix pop-up. Select the appropriate quick fix.
+
+h2. Timeline view
+
+**TBD**.
+
