@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ======================================================================
+     16.07.2010 13:13:42
+
+     site builder
+     description
+
+     DaWeber
+     ====================================================================== -->
+<project name="site builder" default="publish.site">
+    <!-- =================================
+          target: default
+         ================================= -->
+    <target name="publish.site">
+      <property name="repository" location="${sp:repository}"/>
+      <property name="destination" location="${sp:destination}"/>
+      <delete dir="${destination}"/>
+      <mkdir dir="${destination}"/>
+      <move todir="${destination}">
+         <fileset dir="${repository}/" includes="**">
+         </fileset>
+      </move>
+    </target>
+
+</project>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     ====================================================================== -->
+<project name="project" default="create.product">
+  	<target name="create.product">
+		<property name="destination" location="${sp:destination}"/>
+		<delete dir="${destination}"></delete>
+		<makeurl property="repository" file="${sp:repository}"/>
+		<mkdir dir="${destination}"/>
+		<!-- Now run the director via its ant task -->
+		<p2.director flavor="tooling" 
+				roaming="true" 
+				profile="${profile}" 
+				destination="${destination}" 
+				bundlepool="${destination}"
+				extraarguments="-r ${repository}${additionalRepositories} -profileProperties org.eclipse.update.install.features=true -p2.os ${target.os} -p2.ws ${target.ws} -p2.arch ${target.arch}"
+			>
+			<iu id="${iu}"/>
+		</p2.director>
+	</target>
+
+</project>
