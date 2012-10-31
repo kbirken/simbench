@@ -1,0 +1,127 @@
+
+
+
+import ecore;
+
+process(xtext::GeneratedMetamodel this) :
+	ePackage.process();
+
+process(EPackage this) :
+	let vpo = createClassOptionBase() : let vps = createClassSelectorBase() :
+	eClassifiers.add(vpo) ->
+	eClassifiers.add(vps) ->
+	eClassifiers.process(vpo, vps);
+
+process(EClassifier this, EClass vpo, EClass vps) : null;
+
+process(EClass this, EClass vpo, EClass vps) :
+	if name=='VP_Option' then (
+		this.eSuperTypes.add(vpo) ->
+		this.setAbstract(true)
+	) ->
+	if name=='VP_Selector' then (
+		this.eSuperTypes.add(vps) ->
+		this.setAbstract(true)
+	);
+
+
+create ecore::EClass createClassOptionBase() :
+	this.setName("VP_OptionBase") ->
+	this.setInterface(true) ->
+	this.setAbstract(true) ->
+	this.setInstanceTypeName("org.nanosite.simbench.hbsim.addons.VP_OptionBase");
+
+create ecore::EClass createClassSelectorBase() :
+	this.setName("VP_SelectorBase") ->
+	this.setInterface(true) ->
+	this.setAbstract(true) ->
+	this.setInstanceTypeName("org.nanosite.simbench.hbsim.addons.VP_SelectorBase");
+
+/*
+process(EClass this) :
+	if name=='VP_Option' then (
+		eOperations.add(addOperation(
+			"getOpt",
+			getReturnType(getEClassifier("VP_Optional")),
+			'// this is my Java code
+			'
+		)) ->
+		setAbstract(true)
+	) ->
+	if name=='VP_Selector' then (
+		eOperations.add(addOperation(
+			"getMust",
+			getReturnType(getEClassifier("VP_Selectable")),
+			'// this is my Java code
+			'
+		)) ->
+		eOperations.add(addOperation(
+			"getAlt",
+			getReturnType(getEClassifier("VP_Selectable")),
+			'// this is my Java code
+			'
+		)) ->
+		setAbstract(true)
+	);
+
+// abstract <T extends VP_Selectable> T getMust();
+// abstract <T extends VP_Selectable> EList<T> getAlt();
+
+getReturnType (ecore::EClassifier bound) :
+	//getGenericType(bound) ;//->
+	getGenericType(getTypeParameter("T", getGenericType(bound)));
+
+
+getEClassifier (EClass this, String typename) :
+	ePackage.eClassifiers.select(c|c.name==typename).first();
+
+create ecore::EGenericType getGenericType(ecore::EClassifier type) :
+	setEClassifier(type);
+create ecore::EGenericType getGenericType(ecore::ETypeParameter type) :
+	setETypeParameter(type);
+create ecore::EGenericType getGenericType(ecore::EClassifier type, ecore::EGenericType upperBound) :
+	setEClassifier(type) ->
+	setEUpperBound(upperBound);
+
+create ecore::ETypeParameter getTypeParameter(String name) :
+	setName(name);
+create ecore::ETypeParameter getTypeParameter(String name, ecore::EGenericType bound) :
+	setName(name) -> eBounds.add(bound);
+
+//create ecore::EOperation addOperation(ecore::EClassifier c, String name, ecore::EClassifier type, String body) :
+//	setName(name) ->
+//	setEType(type) ->
+//	eAnnotations.add(addBodyAnnotation(body)) ->
+//	((ecore::EClass)c).eOperations.add(this);
+
+create ecore::EOperation addOperation(ecore::EClassifier c, String name, ecore::EGenericType returnType, String body) :
+	setName(name) ->
+	setEGenericType(returnType) ->
+	eAnnotations.add(addBodyAnnotation(body)) ->
+	((ecore::EClass)c).eOperations.add(this);
+
+
+//create ecore::ETypeParameter createTypeParameter(String name, ecore::EGenericType upperBound) :
+//	;
+
+
+
+create ecore::EParameter setParameter(List parameter, ecore::EOperation op) :
+	setName((String)parameter.get(0)) ->
+	setEType((ecore::EClassifier) parameter.get(1)) ->
+	op.eParameters.add(this);
+
+create ecore::EAnnotation addBodyAnnotation(ecore::EOperation op, String body) :
+	setSource("http://www.eclipse.org/emf/2002/GenModel") ->
+	this.createBody(body) ->
+	op.eAnnotations.add(this);
+
+create ecore::EStringToStringMapEntry createBody(ecore::EAnnotation anno, String body) :
+	setKey("body") ->
+	setValue(body) ->
+	anno.details.add(this);
+
+
+*/
+
+

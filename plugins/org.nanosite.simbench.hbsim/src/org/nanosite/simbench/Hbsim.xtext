@@ -1,0 +1,300 @@
+grammar org.nanosite.simbench.Hbsim with org.eclipse.xtext.common.Terminals
+
+generate hbsim "http://www.nanosite.org/simbench/Hbsim"
+
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
+// import generic FeatureModel DSL
+import "platform:/resource/org.nanosite.feamo.hbfm/src-gen/org/nanosite/feamo/Hbfm.ecore" as FM
+
+
+// *****************************************************************************
+
+Model :
+	name='DUMMY'
+	(imports+=Import)*
+	('ref' fm=[FM::FeatureModel] ';')?
+	(vp_elements+=VP_Element)*
+	(configs+=FeatureConfig)*
+	(main=Main)?;
+
+
+Import :
+  'import' importURI=STRING ';';
+
+
+// *****************************************************************************
+
+// artificial parser rules (will never be called) for creating
+// common supertypes in generated ecore model
+
+// two kinds of variation points (Option: yes/no, Selector: one of many)
+VP_Option:   VP_Element | VP_IOActivity | VP_Mapping;
+VP_Optional:   Element | IOActivity | Mapping;
+
+VP_Selector: VP_TriggerCall | VP_StepRef | VP_Expr;
+VP_Selectable: TriggerCall | StepRef | Expr;
+
+
+// *****************************************************************************
+
+VP_Element :
+	(sel=FSelector)? opt=Element;
+
+Element :
+	VariableDef | CPU | Resource | Pool | FunctionBlock | Partitioning | UseCase | Scenario;
+
+
+// *****************************************************************************
+
+VariableDef :
+	'set' name=ID '=' rhs=VP_Expr ';';
+
+
+// *****************************************************************************
+
+CPU :
+	'cpu' name=ID '{'
+		'cores' cores=INT ';'
+		('machine' machine=ID ';')?
+		('normalizer' factor=VP_Expr ';')?
+		('scheduling' scheduling=('plain'|'aps') ';')?
+		('partitions' '{' (partition+=Partition)+ '}' )?
+	'}';
+
+Partition :
+	name=ID ':' percentage=VP_Expr;
+
+
+// *****************************************************************************
+
+Resource :
+	'resource' name=ID '{'
+		'short' shortName=ID ';'
+		'unit' unit=STRING ';'
+		'blocksize' blocksize=VP_Expr ';'
+		interface+=ResourceInterface*
+	'}';
+
+ResourceInterface :
+	'interface' name=ID '{'
+		'bandwidth' bandwidth=VP_Expr ';'
+		'inducedCPU' inducedCPU=VP_Expr ';'
+		'cst' contextSwitchingTime=VP_Expr ';'
+	'}' ';';
+
+ResourceInterfaceRef :
+	resource=[Resource|ID] '.' interface=[ResourceInterface|ID];
+
+
+// *****************************************************************************
+
+Pool :
+	'pool' name=ID '{'
+		'unit' unit=STRING ';'
+		'maximum' maximum=VP_Expr ';'
+	'}';
+
+
+// *****************************************************************************
+
+FunctionBlock :
+	'fb' name=ID '{'
+		(description=Description)?
+		('processes' processes+=Process (',' processes+=Process)* ';')?
+		behaviour+=Behaviour*
+	'}';
+
+Description :
+	STRING ';';
+
+Process :
+	name=ProcessId ('(' argsMatch=STRING ')')? ('[' threads+=Thread (',' threads+=Thread)* ']')?;
+
+Thread :
+	name=ID;
+
+Behaviour :
+	'on' name=ID '()' ('@' taskgroup=INT)? (repeat=BehaviourRepeat)? (token?='token')? '{'
+		(marker_set=MarkerSet)?
+		plan=Plan
+		('send' send+=VP_TriggerCall ';')*
+	'}';
+
+BehaviourRepeat :
+	('repeat' loop=Expr) |
+	('until' until=StopTriggerDef) |
+	('unless' unless=StepRef);
+
+Plan :
+	{Plan} step+=Step*;
+
+
+// *****************************************************************************
+
+StopTriggerDef :
+	name=ID '()';
+
+VP_TriggerCall :
+	must=TriggerCall |
+	(sel+=FSelector alt+=TriggerCall)+ ;
+
+TriggerCall :
+	//fb=[FunctionBlock] '.' ((trigger=[Behaviour|ID] '()') | stop_trigger=[StopTriggerDef|ID]);
+	fb=[FunctionBlock] '.' trigger=[Behaviour|ID] '()';
+
+
+// *****************************************************************************
+
+Step :
+	name=ID ('provides' provides=[Resource])? (milestone=('internal_milestone'|'customer_milestone'))? '{'
+		precondition+=Precondition*
+		action+=Action
+		(marker_set=MarkerSet)?
+	'}';
+
+Precondition :
+	(opt?='opt')? 'precondition' ref=VP_StepRef ';';
+
+VP_StepRef :
+	must=StepRef |
+	(sel+=FSelector alt+=StepRef)+ ;
+
+StepRef :
+	fb=[FunctionBlock|ID] '::' step=[Step|ID];
+
+
+// *****************************************************************************
+
+Action :
+	{Action}
+	('use' consumedCPU=VP_Expr ('on' cpu=[CPU|ID])? ('maxpar' maxpar=INT)? ';')?
+	('wait' additionalWaitTime=VP_Expr ';')?
+	io+=VP_IOActivity*;
+
+VP_IOActivity :
+	(sel=FSelector)? opt=IOActivity;
+
+IOActivity :
+	(op=('read'|'write') content=ID ':' amount=VP_Expr 'via' ioInterface=ResourceInterfaceRef ';') |
+	(op='alloc' pool=[Pool|ID] ':' amount=VP_Expr ';') |
+	(op='free' pool=[Pool|ID] ':' amount=VP_Expr ';');
+
+
+// *****************************************************************************
+
+MarkerSet :
+	'marker' marker+=Marker ('and' marker+=Marker)* ';';
+
+Marker :
+	type=MarkerType ( '(' (param+=STRING)* ')' )?;
+
+enum MarkerType :
+	SlogMatch | TraceStart | AllProcessesStarted | ProvidesDevice | ProvidesServiceInterface;
+
+
+// *****************************************************************************
+
+Partitioning :
+	'partitioning' name=ID ('extends' base=[Partitioning|ID])? '{'
+		(mapping+=VP_Mapping)*
+	'}';
+
+VP_Mapping :
+	(sel=FSelector)? opt=Mapping;
+
+Mapping :
+	'map' fb=[FunctionBlock|ID] 'on' cpu=[CPU|ID] ('in' partition=[Partition|ID] )? ';';
+
+
+// *****************************************************************************
+
+UseCase :
+	'usecase' name=ID '{'
+		(part+=VP_TriggerCall ';')*
+	'}';
+
+Scenario :
+	'scenario' name=ID '{'
+		(usecase+=[UseCase|ID] ';')*
+	'}';
+
+
+// *****************************************************************************
+
+Main :
+	'main' '{'
+		'partitioning' partitioning=[Partitioning|ID] ';'
+		'scenario' scenario=[Scenario|ID] ';'
+		('configuration' config=[FeatureConfig|ID] ';')?
+	'}';
+
+
+// *****************************************************************************
+
+VP_Expr :
+	must=Expr |
+	(sel+=FSelector alt+=Expr)+ ;
+
+Expr :
+	AddExpr;
+
+AddExpr :
+	term+=MultExpr (op+=('+'|'-') term+=MultExpr)*;
+
+MultExpr :
+	factor+=AtomicExpr (op+=('*'|'/') factor+=AtomicExpr)*;
+
+AtomicExpr :
+	var=[VariableDef|ID] | value=Float | '(' Expr ')';
+
+//Float returns ecore::EDouble : INT ('.' INT)?;
+Float : INT ('.' INT)?;
+
+
+// *****************************************************************************
+
+ProcessId returns ecore::EString : ID (('-'|'.') ID)*;
+
+
+// *****************************************************************************
+// *****************************************************************************
+
+// **** FEATURE MODELS ****
+
+// todo: this part should be provided by some reusable artefact (separate xtext project?)
+
+
+// *****************************************************************************
+
+// FSelector needed for implementing variation points in derived models
+
+FSelector :
+//	':' feature+=[FM::Feature|ID] ('|' feature+=[FM::Feature|ID])* ':';
+	':' expr=FSelExpr ':';
+
+FSelExpr:
+	FSelOrExpr;
+
+FSelOrExpr :
+	term+=FSelAndExpr ('|' term+=FSelAndExpr)*;
+
+FSelAndExpr :
+	factor+=FSelAtomicExpr ('&' factor+=FSelAtomicExpr)*;
+
+FSelAtomicExpr :
+	(neg?='!')? feature=[FM::Feature] |
+	'(' FSelExpr ')';
+
+
+// *****************************************************************************
+
+// FeatureConfig defines instances of the FeatureModel
+
+FeatureConfig :
+	'configuration' name=ID ('extends' base=[FeatureConfig])? '{'
+		(('+' plus+=[FM::Feature]) | ('-' minus+=[FM::Feature]))*
+	'}';
+
+
+// *****************************************************************************
