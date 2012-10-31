@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.nanosite.simbench.hbsim.tests
+Bundle-SymbolicName: org.nanosite.simbench.hbsim.tests
+Bundle-Version: 0.7.0.qualifier
+Bundle-Vendor: Harman Infotainment
+Fragment-Host: org.nanosite.simbench.hbsim;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.junit;bundle-version="3.8.2",
+ org.nanosite.simbench.hbsim.generator;bundle-version="1.0.0",
+ org.nanosite.common.util;bundle-version="1.0.0",
+ org.nanosite.simbench.chronsim;bundle-version="1.0.0",
+ org.eclipse.ui.console;bundle-version="3.5.0"
+Import-Package: org.eclipse.core.runtime,
+ org.eclipse.core.runtime.jobs
