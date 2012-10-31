@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/org.nanosite.systemmodel/src-gen"
+    modelPluginID="org.nanosite.systemmodel" modelName="Systemmodel" modelPluginClass=""
+    rootExtendsClass="org.eclipse.emf.ecore.impl.EStoreEObjectImpl" reflectiveDelegation="true"
+    importerID="org.eclipse.emf.importer.ecore" featureDelegation="Reflective" complianceLevel="6.0"
+    copyrightFields="false">
+  <foreignModel>systemmodel.ecore</foreignModel>
+  <genPackages prefix="SystemModel" disposableProviderFactory="true" ecorePackage="systemmodel.ecore#/">
+    <genClasses ecoreClass="systemmodel.ecore#//Model">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference systemmodel.ecore#//Model/customers"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference systemmodel.ecore#//Model/projects"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference systemmodel.ecore#//Model/project_instances"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference systemmodel.ecore#//Model/design_parts"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference systemmodel.ecore#//Model/hw_entities"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference systemmodel.ecore#//Model/trace_markers"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference systemmodel.ecore#//Model/timing_constraints"/>
+    </genClasses>
+    <genClasses ecoreClass="systemmodel.ecore#//DatabaseEntity">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute systemmodel.ecore#//DatabaseEntity/id"/>
+    </genClasses>
+    <genClasses ecoreClass="systemmodel.ecore#//NamedElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute systemmodel.ecore#//NamedElement/name"/>
+    </genClasses>
+    <genClasses ecoreClass="systemmodel.ecore#//Customer"/>
+    <genClasses ecoreClass="systemmodel.ecore#//Project">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference systemmodel.ecore#//Project/customer"/>
+    </genClasses>
+    <genClasses ecoreClass="systemmodel.ecore#//ProjectInstance">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference systemmodel.ecore#//ProjectInstance/project"/>
+    </genClasses>
+    <genClasses ecoreClass="systemmodel.ecore#//DesignPart">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute systemmodel.ecore#//DesignPart/description"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference systemmodel.ecore#//DesignPart/part_of"/>
+    </genClasses>
+    <genClasses ecoreClass="systemmodel.ecore#//HWEntity">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference systemmodel.ecore#//HWEntity/parent"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute systemmodel.ecore#//HWEntity/description"/>
+    </genClasses>
+    <genClasses ecoreClass="systemmodel.ecore#//TraceMarker">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute systemmodel.ecore#//TraceMarker/tag"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute systemmodel.ecore#//TraceMarker/description"/>
+    </genClasses>
+    <genClasses ecoreClass="systemmodel.ecore#//TimingConstraint">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference systemmodel.ecore#//TimingConstraint/project"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute systemmodel.ecore#//TimingConstraint/t_required_msec"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute systemmodel.ecore#//TimingConstraint/t_offered_msec"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference systemmodel.ecore#//TimingConstraint/start_marker"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference systemmodel.ecore#//TimingConstraint/end_marker"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute systemmodel.ecore#//TimingConstraint/req_ref"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute systemmodel.ecore#//TimingConstraint/remarks"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

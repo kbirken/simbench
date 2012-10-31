@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.nanosite.systemmodel
+Bundle-SymbolicName: org.nanosite.systemmodel;singleton:=true
+Bundle-Version: 0.7.0.qualifier
+Bundle-ClassPath: .,
+ lib/mysql-connector-java-5.1.13-bin.jar
+Bundle-Vendor: %providerName
+Bundle-Localization: plugin
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: SystemModel,
+ SystemModel.impl,
+ SystemModel.util
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.emf.ecore;visibility:=reexport
+Bundle-ActivationPolicy: lazy

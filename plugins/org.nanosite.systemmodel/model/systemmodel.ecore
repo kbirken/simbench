@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="SystemModel"
+    nsURI="http://www.nanosite.org/systemmodel/hsm" nsPrefix="hsm">
+  <eClassifiers xsi:type="ecore:EClass" name="Model">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="customers" upperBound="-1"
+        eType="#//Customer" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="projects" upperBound="-1"
+        eType="#//Project" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="project_instances" upperBound="-1"
+        eType="#//ProjectInstance" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="design_parts" upperBound="-1"
+        eType="#//DesignPart" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="hw_entities" upperBound="-1"
+        eType="#//HWEntity" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="trace_markers" upperBound="-1"
+        eType="#//TraceMarker" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="timing_constraints" upperBound="-1"
+        eType="#//TimingConstraint" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DatabaseEntity">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="NamedElement" eSuperTypes="#//DatabaseEntity">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Customer" eSuperTypes="#//NamedElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Project" eSuperTypes="#//NamedElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="customer" lowerBound="1"
+        eType="#//Customer"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ProjectInstance" eSuperTypes="#//NamedElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="project" lowerBound="1"
+        eType="#//Project"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DesignPart" eSuperTypes="#//NamedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="description" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="part_of" lowerBound="1"
+        eType="#//DesignPart"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="HWEntity" eSuperTypes="#//NamedElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parent" lowerBound="1"
+        eType="#//HWEntity"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="description" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TraceMarker" eSuperTypes="#//NamedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="tag" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="description" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TimingConstraint" eSuperTypes="#//NamedElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="project" lowerBound="1"
+        eType="#//Project"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="t_required_msec" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="t_offered_msec" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="start_marker" lowerBound="1"
+        eType="#//TraceMarker"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="end_marker" lowerBound="1"
+        eType="#//TraceMarker"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="req_ref" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="remarks" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+</ecore:EPackage>
