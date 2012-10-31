@@ -1,0 +1,122 @@
+module org.nanosite.simbench.injection.Hbinj
+
+import org.eclipse.emf.mwe.utils.*
+import org.eclipse.xtext.generator.*
+import org.eclipse.xtext.ui.generator.*
+
+var grammarURI = "classpath:/org/nanosite/simbench/injection/Hbinj.xtext"
+var file.extensions = "hbinj"
+var projectName = "org.nanosite.simbench.injection.hbinj"
+var runtimeProject = "../${projectName}"
+
+var feamo_ecore = "classpath:/org/nanosite/feamo/Hbfm.ecore"
+var feamo_genmodel = "classpath:/org/nanosite/feamo/Hbfm.genmodel"
+var feamo_nsURI = "http://www.nanosite.org/feamo/Hbfm"
+var sim_ecore = "classpath:/org/nanosite/simbench/Hbsim.ecore"
+var sim_genmodel = "classpath:/org/nanosite/simbench/Hbsim.genmodel"
+var sim_nsURI = "http://www.nanosite.org/simbench/Hbsim"
+var referencedModels = "${feamo_genmodel},${sim_genmodel}"
+
+Workflow {
+    bean = StandaloneSetup {
+		platformUri = "${runtimeProject}/.."
+	}
+
+	component = DirectoryCleaner {
+		directory = "${runtimeProject}/src-gen/com"
+	}
+
+	component = DirectoryCleaner {
+		directory = "${runtimeProject}.ui/src-gen/com"
+	}
+
+	component = Generator {
+	    // Don't merge manifest files as they are checked out read-only by default.
+	    // Note that this might make manual merges necessary, see MANIFEST.MF_gen
+	    // I consider this a bug, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=323108
+		mergeManifest = false
+
+		pathRtProject = runtimeProject
+		pathUiProject = "${runtimeProject}.ui"
+		projectNameRt = projectName
+		projectNameUi = "${projectName}.ui"
+		language = {
+			uri = grammarURI
+			fileExtensions = file.extensions
+
+			// Java API to access grammar elements (required by several other fragments)
+			fragment = grammarAccess.GrammarAccessFragment {}
+
+			// generates Java API for the generated EPackages
+			fragment = ecore.EcoreGeneratorFragment {
+			   referencedGenModels = "${referencedModels}"
+			   // These mappings make openign the generated ecore file possible,
+			   // see http://www.eclipse.org/forums/index.php?t=msg&goto=517859&
+			   saveMapping = {
+				 from = "${sim_ecore}"
+			     to   = "${sim_nsURI}"
+	           }
+			   saveMapping = {
+				 from = "${feamo_ecore}"
+			     to   = "${feamo_nsURI}"
+	           }
+			}
+
+			// the serialization component
+			fragment = parseTreeConstructor.ParseTreeConstructorFragment {}
+
+			// a custom ResourceFactory for use with EMF
+			fragment = resourceFactory.ResourceFactoryFragment {
+				fileExtensions = file.extensions
+			}
+
+			// The antlr parser generator fragment.
+			fragment = parser.antlr.XtextAntlrGeneratorFragment {
+			//  options = {
+			//		backtrack = true
+			//	}
+			}
+
+			// java-based API for validation
+			fragment = validation.JavaValidatorFragment {
+				composedCheck = "org.eclipse.xtext.validation.ImportUriValidator"
+				//composedCheck = "org.eclipse.xtext.validation.NamesAreUniqueValidator"
+				// registerForImportedPackages = true
+			}
+
+			// scoping and exporting API
+			fragment = scoping.ImportURIScopingFragment {}
+			fragment = exporting.SimpleNamesFragment {}
+
+			// scoping and exporting API
+			//fragment = scoping.ImportNamespacesScopingFragment {}
+			//fragment = exporting.QualifiedNamesFragment {}
+			fragment = builder.BuilderIntegrationFragment {}
+
+			// formatter API
+			fragment = formatting.FormatterFragment {}
+
+			// labeling API
+			fragment = labeling.LabelProviderFragment {}
+
+			// outline API
+			fragment = outline.OutlineTreeProviderFragment {}
+			fragment = outline.QuickOutlineFragment {}
+
+			// quickfix API
+			fragment = quickfix.QuickfixProviderFragment {}
+
+			// content assist API
+			fragment = contentAssist.JavaBasedContentAssistFragment {}
+
+			// generates a more lightweight Antlr parser and lexer tailored for content assist
+			fragment = parser.antlr.XtextAntlrUiGeneratorFragment {}
+
+			// project wizard (optional)
+			// fragment = projectWizard.SimpleProjectWizardFragment {
+			// 		generatorProjectName = "${projectName}.generator"
+			//		modelFileExtension = file.extensions
+			// }
+		}
+	}
+}

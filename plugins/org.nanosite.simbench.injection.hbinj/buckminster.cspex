@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cspecExtension
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:bc="http://www.eclipse.org/buckminster/Common-1.0"
+	xmlns="http://www.eclipse.org/buckminster/CSpec-1.0">
+	<actions>
+	   <!-- generate Xtext code, implicitly does a workspace
+	        refresh, just to be sure -->
+		<public name="generate" actor="jdt.ant">
+		    <actorProperties>
+		       <property key="buildFile" value="ant/build.xml"/>
+		       <property key="targets" value="generate"/>
+		    </actorProperties>
+		</public>
+    </actions>
+</cspecExtension>

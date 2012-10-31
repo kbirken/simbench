@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.nanosite.simbench.injection.hbinj.ui
+Bundle-Vendor: Harman Infotainment
+Bundle-Version: 0.7.0.qualifier
+Bundle-SymbolicName: org.nanosite.simbench.injection.hbinj.ui; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.nanosite.simbench.injection.hbinj;visibility:=reexport,
+ org.eclipse.xtext.ui,
+ org.eclipse.ui.editors;bundle-version="3.5.0",
+ org.eclipse.ui.ide;bundle-version="3.5.0",
+ org.eclipse.xtext.ui.shared,
+ org.eclipse.ui,
+ org.eclipse.xtext.builder,
+ org.antlr.runtime
+Import-Package: org.apache.log4j
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Export-Package: org.nanosite.simbench.injection.ui,
+ org.nanosite.simbench.injection.ui.contentassist.antlr
+Bundle-Activator: org.nanosite.simbench.injection.ui.internal.HbinjActivator

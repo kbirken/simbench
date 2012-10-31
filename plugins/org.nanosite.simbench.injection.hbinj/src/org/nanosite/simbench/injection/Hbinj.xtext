@@ -1,0 +1,135 @@
+grammar org.nanosite.simbench.injection.Hbinj with org.eclipse.xtext.common.Terminals
+
+generate hbinj "http://www.nanosite.org/simbench/injection/Hbinj"
+
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
+// import hbsim DSL
+import "platform:/resource/org.nanosite.simbench.hbsim/src-gen/org/nanosite/simbench/Hbsim.ecore" as sim
+
+
+// *****************************************************************************
+
+InjModel :
+	(imports+=Import)*
+	context=InjContext
+	(fbs+=InjFunctionBlock)*
+	(bg_action=InjBackground)?
+	todos=InjTodoList
+	;
+
+Import :
+  'import' importURI=STRING ';';
+
+
+// *****************************************************************************
+
+// TODO: add reference/id for input file (in order to check if input file matches the model)
+
+InjContext :
+	{InjContext}
+	('partitioning' partitioning=[sim::Partitioning] ';')?
+	('scenario' scenario=[sim::Scenario] ';')?
+	('configuration' config=[sim::FeatureConfig] ';')?
+	('simutrace' tracefile=STRING ';')?
+	('offsets' '{' (offsets+=InjOffset ';')* '}' )?
+	;
+
+InjOffset :
+	cpu=[sim::CPU] ':' offset=SignedInt 'ms';
+
+
+// *****************************************************************************
+
+InjFunctionBlock :
+	'fb' fb=[sim::FunctionBlock] '{'
+		behaviour+=InjBehaviour*
+		(bg_action=InjBackground)?
+		todos=InjTodoList
+	'}';
+
+InjBehaviour :
+	behaviour=[sim::Behaviour] '(' ')' ('instance' instance+=INT)* '{'
+		(markers+=InjMarker)*
+		step+=InjStep*
+		todos=InjTodoList
+	'}';
+
+InjStep :
+	step=[sim::Step] '{'
+		action=InjAction
+		(markers+=InjMarker)*
+		todos=InjTodoList
+	'}';
+
+
+// *****************************************************************************
+
+InjBackground :
+	'background' '{'
+		action=InjAction
+	'}';
+
+
+// *****************************************************************************
+
+InjAction :
+	{InjAction}
+	('use' consumedCPU=Float /*millisec*/ (details+=InjDetailsUse)?	';')?
+	('wait' additionalWaitTime=Float /*millisec*/ ';')?
+	io+=InjIOActivity*;
+
+InjDetailsUse :
+	'('
+		/* the following optional attributes give some background information */
+		'threads' threads=INT          // how many threads have been summed up?
+		//',' 'requests' requests=INT     // number of cpu portions that have been summed up
+	')';
+
+
+// *****************************************************************************
+
+InjIOActivity :
+	op=('read'|'write') amount=Float /*MB*/
+	'via' resInterface=STRING
+	(details=InjDetailsIO)?
+	';';
+
+InjDetailsIO :
+	'('
+		/* the following optional attributes give some background information */
+		'use' consumedCPU=Float /*millisec*/   // can be used to verify the inducedCPU
+		(',' 'file' file=STRING)?              // path+filename, if available
+		(',' 'requests' requests=INT)?         // number of requests that have been accumulated for this IOActivity
+	')';
+
+
+// *****************************************************************************
+
+InjMarker :
+	'detected' type=InjMarkerType '(' (param+=STRING (',' param+=STRING)*)? ')'
+	'at' time=Float 'ms'
+	('(' 'index' eventIndex=INT ')')?
+	';';
+
+enum InjMarkerType :
+	SlogMatch | TraceStart | AllProcessesStarted | ProvidesDevice | ProvidesServiceInterface;
+
+
+// *****************************************************************************
+
+InjTodoList :
+	{InjTodoList}
+	('todo' todos+=STRING ';')*;
+
+
+// *****************************************************************************
+
+SignedInt returns ecore::EBigInteger:
+	('+'|'-')? INT;
+
+//Float returns ecore::EDouble : INT ('.' INT)?;
+Float : INT ('.' INT)?;
+
+
+// *****************************************************************************

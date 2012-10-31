@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<plugin>
+  <extension point="org.eclipse.emf.ecore.generated_package">
+    <package
+       uri = "http://www.nanosite.org/simbench/injection/Hbinj"
+       class = "org.nanosite.simbench.injection.hbinj.HbinjPackage"
+       genModel = "org/nanosite/simbench/injection/Hbinj.genmodel" />
+  </extension>
+</plugin>

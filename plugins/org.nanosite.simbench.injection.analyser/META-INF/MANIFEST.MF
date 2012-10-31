@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Analyser
+Bundle-SymbolicName: com.harman.simbench.injection.analyser; singleton:=true
+Bundle-Version: 0.7.0.qualifier
+Bundle-Activator: org.nanosite.simbench.injection.analyser.Activator
+Bundle-Vendor: Harman Infotainment
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.xtext;bundle-version="1.0.1",
+ org.nanosite.simbench.hbsim;bundle-version="0.7.0",
+ org.nanosite.simbench.injection.hbinj;bundle-version="0.7.0",
+ org.nanosite.feamo.hbfm;bundle-version="0.7.0",
+ org.eclipse.xtext.ui;bundle-version="1.0.1",
+ org.eclipse.xtext.ui.shared;bundle-version="1.0.1",
+ org.nanosite.simbench.injection.hbinj.ui;bundle-version="0.7.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
