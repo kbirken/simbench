@@ -1,0 +1,89 @@
+/*
+ * example01:
+ *        - single CPU
+ *        - one function block, which two chained behaviours 
+ *
+ * 2010-06-07, kbirken: initial version 
+ */
+
+// ***********************************************************************
+
+import "example01.hbfm";
+
+ref Example01Variants;
+
+// ***********************************************************************
+
+// EXPECTED RESULTS
+
+// FB1.sync @ 5000
+// FB1.concurrent @ 10000
+
+
+// ***********************************************************************
+
+cpu CPU1 {
+	cores 1;
+}
+
+
+// ***********************************************************************
+
+fb FB1 {
+	"Simple function block with chained behaviours.";
+	
+	on go() {
+		long_step {
+			use 4990;
+		}
+		short_step {
+			use :P1: 10;
+		}
+		send FB1.continue();
+	}
+	
+	on continue() {
+		step1 {
+			use 10;
+		}
+		step2 {
+			use 4990;
+		}
+	}
+}
+
+
+// ***********************************************************************
+
+partitioning Standard {
+	map FB1 on CPU1;
+}
+
+
+// ***********************************************************************
+
+usecase UC1 {
+	FB1.go();
+}
+
+
+scenario Test {
+	UC1;
+}
+ 
+
+// ***********************************************************************
+
+configuration Simple {
+	+P1
+}
+
+
+main {
+	partitioning Standard;
+	scenario Test;
+	configuration Simple;
+}
+
+
+// ***********************************************************************

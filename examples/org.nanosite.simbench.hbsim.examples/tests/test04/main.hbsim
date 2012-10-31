@@ -1,0 +1,97 @@
+/*
+ * Test04:
+ *        - two CPUs
+ *        - each has one function block only
+ *        - cross CPU trigger and precondition
+ *        - no resources
+ *
+ * 2010-06-13, kbirken: initial version
+ */
+
+// ***********************************************************************
+
+cpu CPU1 {
+	cores 1;
+	normalizer 1.0; // CPU1 is the standard architecture
+}
+
+cpu CPU2 {
+	cores 1;
+	normalizer 2.0; // CPU2 is two times faster than CPU1
+}
+
+
+// ***********************************************************************
+
+fb FB1 {
+	"Simple function block.";
+
+	on go() {
+		init {
+			use 3000 on CPU1;
+		}
+		available {
+			use 2000 on CPU1;
+		}
+	}
+
+	on receive() {
+		processed {
+			use 3000 on CPU1;
+		}
+	}
+}
+
+
+fb FB2 {
+	"Simple second function block.";
+
+	on go() {
+		init {
+			// this step will occur simultaneously with FB1::init
+			use 1000 on CPU1;
+		}
+		available {
+			precondition FB1::available;
+			use 2000 on CPU1;
+		}
+		send FB1.receive();
+	}
+}
+
+
+// ***********************************************************************
+
+partitioning Standard {
+	map FB1 on CPU1;
+	map FB2 on CPU2;
+}
+
+
+// ***********************************************************************
+
+usecase UC1 {
+	FB1.go();
+	FB2.go();
+}
+
+
+scenario Test {
+	UC1;
+}
+
+
+// ***********************************************************************
+
+configuration None {
+}
+
+
+main {
+	partitioning Standard;
+	scenario Test;
+	configuration None;
+}
+
+
+// ***********************************************************************

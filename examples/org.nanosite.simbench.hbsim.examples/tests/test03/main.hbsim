@@ -1,0 +1,99 @@
+/*
+ * Test03:
+ *        - single CPU
+ *        - load by one function block only
+ *        - read access to single resource
+ *
+ * 2010-06-07, kbirken: initial version
+ */
+
+// ***********************************************************************
+
+cpu CPU1 {
+	cores 1;
+}
+
+
+resource Resource1 {
+	short Res1;
+	unit "MB";
+	blocksize 16;
+
+	interface standard {
+		bandwidth 10.0;
+		inducedCPU 10;
+		cst 20;
+	};
+}
+
+
+// ***********************************************************************
+
+fb FB1 {
+	"Simple function block.";
+
+	on go() {
+		init {
+			use 2000;
+		}
+		access_resource_without_cpu {
+			// will last 1 sec at 10% CPU load
+			read data: 10.0 via Resource1.standard;
+		}
+		compute1 {
+			use 2000;
+		}
+		more_accesses_in_parallel {
+			// will last 1 sec at 10% CPU load
+			read data1: 5.0 via Resource1.standard;
+			read data2: 4.9 via Resource1.standard;
+			read data3: 0.1 via Resource1.standard;
+		}
+		compute2 {
+			use 2000;
+		}
+		access_resource_with_cpu {
+			// will last 1 sec (0.9 sec CPU + 0.1100 sec induced by read)
+			use 900;
+			read data: 10.0 via Resource1.standard;
+		}
+		ready {
+			use 1000;
+		}
+	}
+}
+
+
+// ***********************************************************************
+
+partitioning Standard {
+	map FB1 on CPU1;
+}
+
+
+// ***********************************************************************
+
+usecase UC1 {
+	FB1.go();
+}
+
+
+scenario Test {
+	UC1;
+}
+
+
+// ***********************************************************************
+
+configuration None {
+}
+
+
+main {
+	partitioning Standard;
+	scenario Test;
+	configuration None;
+}
+
+
+// ***********************************************************************

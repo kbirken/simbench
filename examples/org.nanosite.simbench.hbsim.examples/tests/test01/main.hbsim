@@ -1,0 +1,74 @@
+/*
+ * Test01:
+ *        - single CPU
+ *        - one function block, which two chained behaviours
+ *
+ * 2010-06-07, kbirken: initial version
+ */
+
+// ***********************************************************************
+
+cpu CPU1 {
+	cores 1;
+}
+
+
+// ***********************************************************************
+
+fb FB1 {
+	"Simple function block with chained behaviours.";
+
+	on go() {
+		long_step {
+			use 4990;
+		}
+		short_step {
+			use 10;
+		}
+		send FB1.continue();
+	}
+
+	on continue() {
+		step1 {
+			use 10;
+		}
+		step2 {
+			use 4990;
+		}
+	}
+}
+
+
+// ***********************************************************************
+
+partitioning Standard {
+	map FB1 on CPU1;
+}
+
+
+// ***********************************************************************
+
+usecase UC1 {
+	FB1.go();
+}
+
+
+scenario Test {
+	UC1;
+}
+
+
+// ***********************************************************************
+
+configuration None {
+}
+
+
+main {
+	partitioning Standard;
+	scenario Test;
+	configuration None;
+}
+
+
+// ***********************************************************************

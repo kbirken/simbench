@@ -1,0 +1,5 @@
+# expected results for test03
+FB1::access_resource_without_cpu  @  3000
+FB1::more_accesses_in_parallel    @  6000
+FB1::access_resource_with_cpu     @  9000
+FB1::ready                        @ 10000

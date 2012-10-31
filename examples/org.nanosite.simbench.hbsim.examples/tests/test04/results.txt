@@ -1,0 +1,4 @@
+# expected results for test04
+FB1::available    @   5000
+FB2::available    @   6000
+FB1::processed    @   9000

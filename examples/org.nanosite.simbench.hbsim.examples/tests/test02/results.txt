@@ -1,0 +1,5 @@
+# expected results for test02
+FB1::sync         @  5000
+FB2::sync         @  5000
+FB1::concurrent   @ 10000
+FB2::concurrent   @ 10000

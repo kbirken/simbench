@@ -1,0 +1,91 @@
+/*
+ * Test02:
+ *        - single CPU
+ *        - load by >1 function blocks
+ *        - precondition
+ *
+ * 2010-06-07, kbirken: initial version
+ */
+
+// ***********************************************************************
+
+cpu CPU1 {
+	cores 1;
+}
+
+
+// ***********************************************************************
+
+fb FB1 {
+	"Simple function block.";
+
+	on go() {
+		long_step {
+			use 4990;
+		}
+		short_step {
+			use 10;
+		}
+		sync {
+			// sync should be reached after 5 secs
+		}
+		concurrent {
+			// in this step both FBs share the CPU, should last 5 secs altogether
+			use 2500;
+		}
+	}
+}
+
+
+fb FB2 {
+	"Another function block.";
+
+	on go() {
+		waiting {
+		}
+		sync {
+			precondition FB1::sync;
+		}
+		concurrent {
+			// in this step both FBs share the CPU, should last 5 secs altogether
+			use 2500;
+		}
+	}
+}
+
+
+// ***********************************************************************
+
+partitioning Standard {
+	map FB1 on CPU1;
+	map FB2 on CPU1;
+}
+
+
+// ***********************************************************************
+
+usecase UC1 {
+	FB1.go();
+	FB2.go();
+}
+
+
+scenario Test {
+	UC1;
+}
+
+
+// ***********************************************************************
+
+configuration None {
+}
+
+
+main {
+	partitioning Standard;
+	scenario Test;
+	configuration None;
+}
+
+
+// ***********************************************************************

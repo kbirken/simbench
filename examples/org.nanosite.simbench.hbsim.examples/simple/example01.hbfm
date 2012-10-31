@@ -1,0 +1,20 @@
+/*
+ * The feature model for example01
+ */
+
+// ***************************************************************************
+
+feature_model Example01Variants {
+	// concept features
+	project feature;
+	
+	// feature details
+	project: (P1 | P2 | P3);
+	feature: (F1 | F2 | F3);
+}
+
+feature_model Second {
+	a b;	
+}
+
+// ***************************************************************************
