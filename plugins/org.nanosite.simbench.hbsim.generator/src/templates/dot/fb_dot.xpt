@@ -1,0 +1,108 @@
+«IMPORT hbsim»
+«EXTENSION templates::helpers»
+«EXTENSION templates::dot::dot»
+«EXTENSION templates::hbsim::Extensions»
+
+«DEFINE dotFile(String targetPath, Boolean withScenario) FOR Model»
+«FILE "fb_dot.txt"-»
+«EXPAND templates::dot::common::DotHeader FOR main-»
+«FOREACH getAllFunctionBlocks() AS fb-»
+	«LET fb.description.dot() AS desc»
+	«fb.id()» [label="«fb.name»",shape=rectangle,fillcolor=lightgrey«IF desc.length>0»,tooltip=«desc»«ENDIF»];
+	«ENDLET»
+«ENDFOREACH»
+
+«FOREACH getAllFunctionBlocks() AS fb-»
+	«FOREACH fb.getReachableBehaviours(this).plan.step AS s-»
+		«EXPAND Precondition(fb.id(), main.config) FOREACH s.getPreconditions(main.config)-»
+	«ENDFOREACH-»
+	«EXPAND DependencyArrow(fb.id(), "red") FOREACH fb.getResourcePreconditionFBs(this)-»
+
+	«IF fb.getReachableBehaviours(this).send.size>0-»
+	// message dependencies for FunctionBlock «fb.id()»
+	«ENDIF-»
+	«FOREACH fb.getReachableBehaviours(this) AS b-»
+		«FOREACH b.getTriggerCalls(main.config) AS tr-»
+		«fb.id()» -> «tr.fb.id()» [color="gold1" arrowhead="vee"];
+		«ENDFOREACH-»
+	«ENDFOREACH-»
+«ENDFOREACH-»
+
+	// one cluster for each cpu
+«FOREACH getAllCPUs() AS cpu-»
+	subgraph cluster_cpu_«cpu.name» {
+		fontname="Arial";
+		fontsize=20;
+		label="«cpu.name»";
+		style=filled;
+		color="#c0e0e0";
+		fillcolor="#e0ffff";
+		shape=box3d;
+		«EXPAND FunctionBlock(cpu) FOREACH main.partitioning.getMappings(main.config).select(m | getAllFunctionBlocks().contains(m.fb))-»
+	}
+«ENDFOREACH»
+	// all FBs that are not mapped
+«LET getAllFunctionBlocks().reject(x|main.partitioning.getMappings(main.config).fb.contains(x)) AS unmapped_fb»
+	«FOREACH unmapped_fb AS fb-»
+	«ERROR "FunctionBlock '" + fb.fullName() + "' is not mapped to cpu, partitioning should be fixed."-»
+	«ENDFOREACH-»
+	«EXPAND FunctionBlock(null) FOREACH unmapped_fb-»
+«ENDLET»
+
+«IF withScenario-»
+	// extra cluster with scenario and dependency arrows for each use case
+	subgraph cluster_scenario {
+		fontname="Arial";
+		fontsize=14;
+		label="Scenario: «main.scenario.name»";
+		style=filled;
+		color=black;
+		fillcolor=green;
+		shape=rect;
+		«FOREACH getAllUseCases() AS uc-»
+		«uc.id()» [label="«uc.name»" shape="ellipse"];
+		«ENDFOREACH-»
+	}
+
+	«FOREACH getAllUseCases() AS uc-»
+	«FOREACH uc.getTriggerCalls(main.config) AS tr-»
+	«uc.id()» -> «tr.fb.id()» [color="gold1" arrowhead="vee"];
+	«ENDFOREACH-»
+	«ENDFOREACH-»
+«ENDIF»
+«EXPAND templates::dot::common::DotFooter FOR main-»
+«ENDFILE»
+«ENDDEFINE»
+
+
+
+«DEFINE Precondition(String currentStep, FeatureConfig cfg) FOR Precondition-»
+	«IF opt-»
+		«EXPAND DependencyArrow(currentStep, "green") FOR ref.bind(cfg).step.getFB()-»
+	«ELSE-»
+		«EXPAND DependencyArrow(currentStep, "blue") FOR ref.bind(cfg).step.getFB()-»
+	«ENDIF-»
+«ENDDEFINE»
+
+
+«DEFINE DependencyArrow(String currentStep, String color) FOR FunctionBlock-»
+	«id()» -> «currentStep» [color="«color»"];
+«ENDDEFINE»
+
+
+«DEFINE FunctionBlock(CPU target) FOR Mapping-»
+	«IF cpu == target-»
+		«IF cpu.needsPartitioning() && partition==null-»
+		«ERROR "Undefined cpu partition for FunctionBlock '" + fb.fullName() + "', partitioning should be fixed."-»
+		«ENDIF-»
+		«IF (!cpu.needsPartitioning()) && partition!=null-»
+		«ERROR "Partition '" + partition.name + "' is ignored for FunctionBlock '" + fb.fullName() + "', scheduler doesn't support partitions."-»
+		«ENDIF-»
+		«EXPAND FunctionBlock(partition) FOR fb-»
+	«ENDIF-»
+«ENDDEFINE»
+
+«DEFINE FunctionBlock(Partition partition) FOR FunctionBlock-»
+		«id()» [label="«id()»«partition==null ? "" : "\\n" + partition.name»"];
+«ENDDEFINE»
+

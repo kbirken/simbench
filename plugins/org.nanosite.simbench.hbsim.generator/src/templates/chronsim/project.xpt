@@ -1,0 +1,207 @@
+«IMPORT hbsim»
+«EXTENSION templates::helpers»
+«EXTENSION templates::hbsim::Extensions»
+«EXTENSION templates::chronsim::chronsim»
+
+«DEFINE iprFile(String targetPath, String genPath) FOR Model»
+  «FILE "model_gen.ipr"-»
+<?xml version="1.0" encoding="iso-8859-1"?>
+	<chronsimproject>
+		<general>
+			<creator version="1.7.0" build="20090617A" />
+			<dir>C:\</dir>
+			<savedir>C:\</savedir>
+			<name>Harman_Simbench_Model</name>
+			<version>1</version>
+			<description>
+			«EXPAND ProjectDescription(targetPath) FOR this»
+			</description>
+			<last-modified>2009-06-24T14:14:14</last-modified>
+			<author>automatically generated</author>
+			<email>klaus.birken@harman.com</email>
+		</general>
+		<toolsettings>
+		</toolsettings>
+		<specification>
+			<includepath>$INSTALL\lib</includepath>
+			<options rtos="none" cc="none" std="none" warn="1" additionalcflags="" />
+		«FOREACH getAllCPUs() AS cpu-»
+			<file>
+				<name>«genPath»\«cpu.name».c</name>
+				<includepath>$PROJECT</includepath>
+			</file>
+		«ENDFOREACH-»
+		«FOREACH getAllResources() AS res-»
+			<file>
+				<name>«genPath»\«res.shortName».c</name>
+			</file>
+		«ENDFOREACH-»
+		«FOREACH getAllCPUs() AS cpu-»
+			«EXPAND ProcessDef(genPath + "/" + cpu.name, 900, 1) FOR "initModel_"+cpu.name-»
+			«EXPAND ProcessDef(genPath + "/" + cpu.name, 500, 0) FOR "System_"+cpu.name-»
+		«ENDFOREACH»
+		«FOREACH getAllFunctionBlocks() AS fb-»
+		«FOREACH fb.getTaskgroups(this) AS tg-»
+			«EXPAND ProcessDef(genPath + "/" + fb.getCPU(this).name, 500, 0) FOR fb.funcName(tg)-»
+		«ENDFOREACH-»
+		«ENDFOREACH-»
+		«FOREACH getAllFunctionBlocks() AS fb-»
+			«FOREACH fb.getReachableBehaviours(this).plan.getResources(main.config).toSet() AS res-»
+				«EXPAND ProcessDef(genPath + "/" + res.shortName, 500, 1) FOR fb.id()+"_"+res.shortName-»
+			«ENDFOREACH-»
+		«ENDFOREACH-»
+		</specification>
+		<allocation>
+			<resourcetype
+					library="$INSTALL/models/generic-clib.ism"
+					type="generic-clib"
+					name="CPU">
+				<clock period="10.101 ns" timeslice="4.000 ms"/>
+				<rtos>
+					<scheduler type="time-slice" strategy="round-robin"/>
+					<processes exclusive="false" isrFlag="true" preemptFlag="true" maximum="99"/>
+					<stack default="1024" />
+				</rtos>
+				<compiler optimization="0"/>
+				«FOREACH getAllCPUs() AS cpu-»
+				<instance name="«cpu.name»">
+					<segmentmap>
+						<segment name="ram" base="0x1000000" size="0x1000000" flags="0x122" pages="1" sections="data:bss:.bss:stack:heap"  />
+						<segment name="rom" base="0x2000000" size="0x1000000" flags="0x113" pages="1" sections="text"  />
+						<segment name="shm" base="0x1000" size="0x1000" flags="0x2a" pages="1" sections="" sharedMem="shm" />
+					</segmentmap>
+				</instance>
+				«ENDFOREACH-»
+			</resourcetype>
+			<resourcetype
+					library="$INSTALL/models/generic-clib.ism"
+					type="generic-clib"
+					name="Storage">
+				<clock period="10.000 ns" timeslice="10.000 ms"/>
+				<rtos>
+					<scheduler type="run-to-completi" strategy="round-robin"/>
+					<processes exclusive="false" isrFlag="true" preemptFlag="true" maximum="99"/>
+					<stack default="1024" />
+				</rtos>
+				<compiler optimization="0"/>
+				«FOREACH getAllResources() AS res-»
+					<instance name="«res.shortName»">
+						<segmentmap>
+							<segment name="ram" base="0x1000000" size="0x1000000" flags="0x122" pages="1" sections="data:bss:.bss:stack:heap"  />
+							<segment name="rom" base="0x2000000" size="0x1000000" flags="0x113" pages="1" sections="text"  />
+							<segment name="shm" base="0x1000" size="0x1000" flags="0x2a" pages="1" sections="" sharedMem="shm" />
+						</segmentmap>
+					</instance>
+				«ENDFOREACH»
+			</resourcetype>
+		</allocation>
+		<mapping>
+			«FOREACH getAllCPUs() AS cpu-»
+				«EXPAND Mapping("CPU", genPath + "/" + cpu.name, cpu.name) FOR "initModel_"+cpu.name-»
+				«EXPAND Mapping("CPU", genPath + "/" + cpu.name, cpu.name) FOR "System_"+cpu.name-»
+			«ENDFOREACH»
+			«FOREACH main.partitioning.getMappings(main.config) AS m-»
+				«IF getAllFunctionBlocks().contains(m.fb)-»
+					«FOREACH m.fb.getTaskgroups(this) AS tg-»
+					«EXPAND Mapping("CPU", genPath + "/" + m.cpu.name, m.cpu.name) FOR m.fb.funcName(tg)-»
+					«ENDFOREACH-»
+				«ENDIF-»
+			«ENDFOREACH-»
+			«FOREACH getAllFunctionBlocks() AS fb-»
+				«FOREACH fb.getReachableBehaviours(this).plan.getResources(main.config).toSet() AS res-»
+					«EXPAND Mapping("Storage", genPath + "/" + res.shortName, res.shortName) FOR fb.id()+"_"+res.shortName-»
+				«ENDFOREACH-»
+			«ENDFOREACH-»
+		</mapping>
+		<estimationoverride>
+		</estimationoverride>
+		<clockcounter>
+			«FOREACH getAllCPUs() AS cpu-»
+				<clock id="/CPU/«cpu.name»/«cpu.name»" gran_value="10.101" gran_unit="ns" range_value="1" range_unit="s" start_value="0" start_unit="ps" drift_value="0">
+				</clock>
+			«ENDFOREACH-»
+			«FOREACH getAllResources() AS res-»
+				<clock id="/Storage/«res.shortName»/«res.shortName»" gran_value="10" gran_unit="ns" range_value="1" range_unit="s" start_value="0" start_unit="ps" drift_value="0">
+				</clock>
+			«ENDFOREACH-»
+		</clockcounter>
+		<requirements>
+			<rtos_fail enabled="1"/>
+		</requirements>
+		<stimulation>
+		</stimulation>
+		<communication>
+			«FOREACH getAllCPUs() AS cpu-»
+				<resource name="/CPU/«cpu.name»">
+				</resource>
+			«ENDFOREACH-»
+			«FOREACH getAllResources() AS res-»
+				<resource name="/Storage/«res.shortName»">
+				</resource>
+			«ENDFOREACH-»
+		</communication>
+		<synchronization>
+			«FOREACH getAllCPUs() AS cpu-»
+				<resource name="/CPU/«cpu.name»">
+				</resource>
+			«ENDFOREACH-»
+			«FOREACH getAllResources() AS res-»
+				<resource name="/Storage/«res.shortName»">
+				</resource>
+			«ENDFOREACH-»
+		</synchronization>
+	</chronsimproject>
+
+  «ENDFILE»
+
+«FILE "milestones.txt"-»
+«FOREACH this.getAllFunctionBlocks().getReachableBehaviours(this).plan.step AS step-»
+«IF (step.getFB().name == "MilestoneCollector") && (step.name == "ready")-»
+«FOREACH step.getPreconditions(main.config).ref.bind(main.config) AS ref-»
+«ref.fb.id()»::«ref.step.id()»
+«ENDFOREACH-»
+«ENDIF-»
+«ENDFOREACH»
+«ENDFILE»
+«ENDDEFINE»
+
+
+«DEFINE ProjectDescription(String targetPath) FOR Model-»
+This file has been generated by SIMBENCH.
+
+---
+
+MODEL:
+Scenario:     «this.main.scenario.name»
+Partitioning: «this.main.partitioning.name»
+Use cases:
+«FOREACH this.main.scenario.usecase AS uc-»
+   «uc.name»
+«ENDFOREACH-»
+
+STATISTICS:
+CPUs:            «this.getAllCPUs().size»
+Resources:       «this.getAllResources().size»
+Function blocks: «this.getAllFunctionBlocks().size»
+Behaviours:      «this.getAllFunctionBlocks().getReachableBehaviours(this).size»
+
+---
+
+2010, Harman/Becker Automotive Systems
+«ENDDEFINE»
+
+
+«DEFINE ProcessDef(String file, Integer prio, Integer init) FOR String-»
+			<process name="«this»" init="«init»" max="1" file="«file».c" func="«this»" stack_limit="1024" isr="0" preemptable="1" >
+				<instance name="System/«file».c/«this»/«this»/«this»1" priority="«prio»" />
+			</process>
+«ENDDEFINE»
+
+
+«DEFINE Mapping(String type, String file, String resource) FOR String-»
+			<map>
+				<source>System/«file».c/«this»/«this»/«this»1</source>
+				<target>/«type»/«resource»</target>
+			</map>
+«ENDDEFINE»
+

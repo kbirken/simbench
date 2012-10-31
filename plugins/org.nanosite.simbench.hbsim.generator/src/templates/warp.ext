@@ -1,0 +1,64 @@
+import hbsim;
+extension templates::helpers;
+extension templates::expressions;
+extension templates::hbsim::Extensions;
+
+// round time-Expr to actual timebase (which is microsec)
+Integer time (Real r) : (r * 1000.0).rounded();
+Integer time (VP_Expr e, FeatureConfig cfg) : e.eval(cfg).time();
+Integer time (VP_Expr e, FeatureConfig cfg, Real factor) :
+	let r = e.eval(cfg) * factor :
+	r.time();
+
+// round percent-Expr to percent*10 (e.g., 12.5% resolves to 125)
+Integer percent (Real r) : (r * 10.0).rounded();
+Integer percent (VP_Expr e, FeatureConfig cfg) : e.eval(cfg).percent();
+
+// round amount-Expr to actual n*1000 (needed for pool alloc/free amounts)
+Integer amount (Real r) : (r * 1000.0).rounded();
+Integer amount (VP_Expr e, FeatureConfig cfg) : e.eval(cfg).amount();
+
+
+// helpers for computing ids of various elements
+cached List[Step] allSteps(Model model) : model.getAllFunctionBlocks().getReachableBehaviours(model).plan.step;
+cached Integer index(Step step, Model model) : model.allSteps().indexOf(step);
+cached Integer index(Behaviour b, Model model) : b.getFB().getReachableBehaviours(model).toList().indexOf(b);
+cached Integer index(FunctionBlock fb, Model model) : model.getAllFunctionBlocks().toList().indexOf(fb);
+cached List[Step] preconditionsExplicit (Step step, FeatureConfig cfg) : step.getPreconditions(cfg).ref.bind(cfg).step;
+cached List[Step] preconditionsImplicit (Step step, Model model) :
+	step.getAccessedResources(model.main.config).getPreconditions(model);
+cached List[Step] preconditions (Step step, Model model) :
+	step.preconditionsImplicit(model).addAll(step.preconditionsExplicit(model.main.config));
+
+// computations for IOActivities
+cached Real getBandwidth (IOActivity io, FeatureConfig cfg) :
+	io.getInterface().bandwidth.eval(cfg);
+cached Integer getTime (IOActivity io, FeatureConfig cfg) :  // return time for IOActivity (read access) in microsecs
+	(io.amount.eval(cfg) * 1000 / io.getBandwidth(cfg)).time();
+cached Integer getInducedCPU (IOActivity io, FeatureConfig cfg) :  // return induced CPU time for IOActivity in microsecs
+	(io.getTime(cfg) * io.getInterface().inducedCPU.eval(cfg) / 100).rounded();
+cached Integer getAmount (IOActivity io, FeatureConfig cfg) :  // return amount*1000 of this alloc/free activity (<0 is free, >0 is alloc)
+	(io.op=='alloc' ? 1 : -1) * io.amount.amount(cfg);
+
+cached List[IOActivity] ioActivities (Step step, ResourceInterface ri, FeatureConfig cfg) :
+	step.action.getResourceIOs(cfg).select(io | io.ioInterface.interface==ri);
+cached Integer resourceTime (Step step, ResourceInterface ri, FeatureConfig cfg) :
+	step.ioActivities(ri,cfg).collect(io|io.getTime(cfg)).sumlist();
+
+cached List[IOActivity] poolActivities (Step step, Pool pool, FeatureConfig cfg) :
+	step.action.getPoolIOs(cfg).select(io | io.pool==pool);
+cached Integer poolAmount (Step step, Pool pool, FeatureConfig cfg) :
+	step.poolActivities(pool,cfg).collect(p|p.getAmount(cfg)).sumlist();
+
+// computations for Actions
+Integer allCPU (Action a, CPU cpu, FeatureConfig cfg) :
+	(a.consumedCPU==null ? 0 : a.consumedCPU.time(cfg, a.cpuFactor(cpu, cfg))) + a.inducedCPU(cfg);
+Integer inducedCPU (Action a, FeatureConfig cfg) :
+	a.getResourceIOs(cfg).getInducedCPU(cfg).sumlist();
+
+// helpers for Steps
+Integer milestoneType (Step s) :
+	s.milestone==null ? 0 : (
+		s.milestone=='internal_milestone' ? 1 : 2
+	);
+

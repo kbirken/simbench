@@ -1,0 +1,71 @@
+«IMPORT hbsim»
+«EXTENSION templates::helpers»
+«EXTENSION templates::hbsim::Extensions»
+
+
+«DEFINE Transform(String targetPath) FOR Model»
+«FILE "trace_analysis_structure.txt"-»
+# REPORT GENERATED FROM SIMBENCH
+v7
+# BASIC MODEL PROPERTIES
+partitioning=«main.partitioning.name» scenario=«main.scenario.name» configuration=«main.config.name»
+# PROCESSES
+«LET getAllFunctionBlocks().select(fb|fb.getCPU(this).machine!=null) AS fbs-»
+«fbs.size»
+«FOREACH fbs AS fb-»
+«fb.id()» «fb.getCPU(this).machine» «fb.processes.size»
+«FOREACH fb.processes AS p-»
+  «p.name» «p.threads.size»«IF p.argsMatch!=null» "«p.argsMatch»"«ENDIF»
+  «FOREACH p.threads AS thr-»
+    «thr.name»
+  «ENDFOREACH-»
+«ENDFOREACH-»
+«ENDFOREACH-»
+# BEHAVIOURS AND MARKERS
+«LET getAllReachableBehaviours().select(b|fbs.contains(b.getFB())) AS bhvrs-»
+«bhvrs.size»
+«FOREACH bhvrs AS b-»
+«b.getFB().id()» «b.id()» «b.plan==null ? 1 : 1+b.plan.step.size»
+  _ «b.marker_set==null ? 0 : b.marker_set.marker.size»
+«IF b.marker_set!=null»«EXPAND MarkerSet FOR b.marker_set»«ENDIF-»
+«FOREACH b.plan.step AS s-»
+  «s.id()» «IF s.marker_set!=null»«s.marker_set.marker.size»«ELSE»0«ENDIF»
+  «IF s.marker_set!=null»«EXPAND MarkerSet FOR s.marker_set»«ENDIF-»
+«ENDFOREACH-»
+«ENDFOREACH-»
+«ENDLET-»
+«ENDLET-»
+«ENDFILE»
+
+«FILE "model_dependencies.csv"-»
+Type;Client;Interface;Server
+«LET getAllFunctionBlocks().select(fb|fb.getCPU(this).machine!=null) AS fbs-»
+«FOREACH fbs AS fb-»
+«FOREACH fb.getReachableBehaviours(this) AS b-»
+«FOREACH b.getTriggerCalls(main.config) AS tr-»
+trigger;«tr.fb.id()»;«tr.trigger.id()»;«fb.id()»
+«ENDFOREACH-»
+«ENDFOREACH-»
+«FOREACH fb.getReachableBehaviours(this).plan.step AS s-»
+«FOREACH s.getPreconditions(main.config) AS prec-»
+«LET prec.ref.bind(main.config).step AS s2-»
+«IF prec.opt»opt_«ENDIF»precondition;«fb.id()»;«s2.id()»;«s2.getFB().id()»
+«ENDLET-»
+«ENDFOREACH-»
+«FOREACH s.getAccessedResources(main.config) AS res-»
+«FOREACH res.getPreconditions(this).toSet() AS s2-»
+resource;«fb.id()»;«res.id()»;«s2.getFB().id()»
+«ENDFOREACH-»
+«ENDFOREACH-»
+«ENDFOREACH-»
+«ENDFOREACH-»
+«ENDLET-»
+«ENDFILE»
+«ENDDEFINE»
+
+
+«DEFINE MarkerSet FOR MarkerSet-»
+  «FOREACH marker AS m-»
+    «m.type»«FOREACH m.param AS p» "«p»"«ENDFOREACH»
+  «ENDFOREACH-»
+«ENDDEFINE»

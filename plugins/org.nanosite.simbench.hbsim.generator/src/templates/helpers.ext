@@ -1,0 +1,121 @@
+import hbsim;
+
+extension templates::hbsim::Extensions;
+extension templates::expressions;
+
+// some extensions to ensure compatibility of hbsim- (xtext-based) and simu- (ecore-based) models
+FunctionBlock getFB (Step step) : (FunctionBlock)step.eContainer.eContainer.eContainer;
+Behaviour getBehaviour (Step step) : (Behaviour)step.eContainer.eContainer;
+FunctionBlock getFB (Behaviour b) : (FunctionBlock)b.eContainer;
+Resource getResource (ResourceInterface i) : (Resource)i.eContainer;
+ResourceInterface getInterface (IOActivity io) : io.ioInterface.interface;
+
+
+// making C identifiers out of strings
+String makeId (String s) : s.replaceAll(' ', '_');
+cached String id (FunctionBlock fb) : fb.name.makeId();
+cached String id (Behaviour b) : b.name.makeId();
+cached String id (StopTriggerDef tr) : tr.name.makeId();
+cached String id (Step s) : s.name.makeId();
+cached String id (Resource r) : r.name.makeId();
+cached String id (UseCase uc) : uc.name.makeId();
+
+
+// human readable full names for entities
+cached String fullName (FunctionBlock fb) : fb.name;
+cached String fullName (Behaviour b) : b.getFB().fullName() + "::" + b.name;
+cached String fullName (Step s) : s.getBehaviour().fullName() + "::" + s.name;
+
+
+// remove \n, needed for dot generators
+cached String dot (String s) : s.subString(0,s.length-1).replaceAll('\r', '').replaceAll('\n', '').replaceAll('\t', ' ');
+
+// model navigation extensions
+cached Set[Precondition] getPreconditions (Step step, FeatureConfig cfg) :
+	step.precondition.select(x|x.ref.bind(cfg)!=null);
+cached Set[IOActivity] getAnyIOs (Action action, FeatureConfig cfg) :
+	action.io.select(x|x.bind(cfg)!=null).bind(cfg);  // TODO: calling bind() 2x is inefficient, better solution?
+cached Set[IOActivity] getPoolIOs (Action action, FeatureConfig cfg) :
+	action.getAnyIOs(cfg).select(io|io.op=='alloc' || io.op=='free').toSet();
+cached Set[IOActivity] getResourceIOs (Action action, FeatureConfig cfg) :
+	action.getAnyIOs(cfg).select(io|io.op=='read' || io.op=='write').toSet();
+cached Set[TriggerCall] getTriggerCalls (Behaviour b, FeatureConfig cfg) :
+	b.send.select(x|x.bind(cfg)!=null).bind(cfg);  // TODO: calling bind() 2x is inefficient, better solution?
+cached Set[TriggerCall] getTriggerCalls (UseCase uc, FeatureConfig cfg) :
+	uc.part.select(x|x.bind(cfg)!=null).bind(cfg);  // TODO: calling bind() 2x is inefficient, better solution?
+cached Set[ResourceInterface] getResourceInterfaces (Plan plan, FeatureConfig cfg) :
+	plan.step.action.getResourceIOs(cfg).ioInterface.interface.toSet();
+cached Set[Resource] getAccessedResources (Step step, FeatureConfig cfg) :
+	step.action.getResourceIOs(cfg).ioInterface.interface.eContainer.toSet();
+cached Set[Resource] getResources (Plan plan, FeatureConfig cfg) :
+	plan.step.getAccessedResources(cfg).toSet();
+cached Set[Pool] getAccessedPools (Step step, FeatureConfig cfg) :
+	step.action.getPoolIOs(cfg).pool.toSet();
+cached Set[Pool] getPools (Plan plan, FeatureConfig cfg) :
+	plan.step.getAccessedPools(cfg).toSet();
+cached Set[Step] getPreconditions (Resource res, Model model) :
+	model.getAllFunctionBlocks().getReachableBehaviours(model).plan.step.select(e|e.provides == res).toSet();
+cached Set[Mapping] getMappingsLocal (Partitioning part, FeatureConfig cfg) :
+	part.mapping.select(x|x.bind(cfg)!=null).bind(cfg).toSet();  // TODO: calling bind() 2x is inefficient, better solution?
+cached Set[Mapping] getMappings (Partitioning part, FeatureConfig cfg) :
+	part.base==null ?
+		part.getMappingsLocal(cfg) :
+		part.getMappingsLocal(cfg).union(part.base.getMappings(cfg)).toSet();
+
+
+// top-level model navigation
+// (used currently because top-level lists don't contain elements from imported files)
+cached Set[CPU] getAllCPUs (Model model) :
+	model.main.partitioning.getMappings(model.main.config).cpu.toSet();
+cached Set[UseCase] getAllUseCases (Model model) :
+	model.main.scenario.usecase.toSet();
+cached Set[TriggerCall] getAllExternalTriggers (Model model) :
+	model.getAllUseCases().getTriggerCalls(model.main.config).toSet();
+cached Set[Behaviour] getAllReachableBehaviours (Model model) :
+	model.getAllExternalTriggers().reachable(model.main.config);
+cached Set[FunctionBlock] getAllFunctionBlocks (Model model) :
+	model.getAllReachableBehaviours().getFB().toSet();
+	//model.getAllExternalTriggers().fb.toSet();
+cached Set[Resource] getAllResources (Model model) :
+	model.getAllFunctionBlocks().behaviour.plan.getResources(model.main.config).toSet();
+cached Set[Pool] getAllPools (Model model) :
+	model.getAllFunctionBlocks().behaviour.plan.getPools(model.main.config).toSet();
+cached Set[Behaviour] getReachableBehaviours (FunctionBlock fb, Model model) :
+	model.getAllReachableBehaviours().select(b|fb.behaviour.contains(b));
+
+
+// reachability analysis
+cached Set[Behaviour] directSuccs (Behaviour b, FeatureConfig cfg) :
+	b.getTriggerCalls(cfg).trigger.toSet();
+cached Set[Behaviour] directSuccessors (Set[Behaviour] bs, FeatureConfig cfg) :
+	bs.collect(b|b.directSuccs(cfg)).flatten().toSet();
+cached Set[Behaviour] successorsRec (Set[Behaviour] visit, Set[Behaviour] visited, FeatureConfig cfg) :
+	let nextvis = visit.directSuccessors(cfg) :
+		let newnext = nextvis.without(visited) :
+			newnext.size==0 ? visited : successorsRec(newnext, visited.union(newnext), cfg);
+cached Set[Behaviour] reachable (Set[TriggerCall] start, FeatureConfig cfg) :
+	let bs = start.trigger.toSet() : bs.successorsRec(bs, cfg);
+
+
+// filtered access according to CPU mapping
+cached Mapping getMapping (FunctionBlock fb, Model model) :
+	// this only works if there is at least one mapping for fb! (first()..)
+	model.main.partitioning.getMappings(model.main.config).select(m | m.fb==fb).toList().first();
+cached CPU getCPU (FunctionBlock fb, Model model) :
+	fb.getMapping(model).cpu;
+cached Partition getPartition (FunctionBlock fb, Model model) :
+	fb.getMapping(model).partition;
+cached Set[FunctionBlock] getAllFunctionBlocksOn (Model model, CPU cpu) :
+	model.getAllFunctionBlocks().select(fb | fb.getCPU(model) == cpu).toSet();
+
+
+// helpers partitioning of CPUs
+cached Boolean needsPartitioning (CPU cpu) :
+	cpu.scheduling!=null && cpu.scheduling=='aps' && cpu.partition!=null && cpu.partition.size>0;
+
+
+// computations for Actions
+Real cpuFactor (Action a, CPU cpu, FeatureConfig cfg) :
+	let factor1 = (a.cpu==null || a.cpu.factor==null) ? 1.0 : a.cpu.factor.eval(cfg) :
+		let factor2 = (cpu==null || cpu.factor==null) ? 1.0 : cpu.factor.eval(cfg) :
+			factor1 / factor2;

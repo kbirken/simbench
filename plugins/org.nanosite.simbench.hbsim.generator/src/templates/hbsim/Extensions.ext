@@ -1,0 +1,62 @@
+import hbfm;
+import hbsim;
+
+extension templates::hbsim::feature_model_helpers;
+extension templates::hbsim::ModelAccessor;
+
+// access to bounded elements of model
+cached List[Element] getElements (Model model, FeatureConfig cfg) :
+	model.getVPElements().bind(cfg);
+
+
+// access to specific top-level elements
+cached List[VariableDef] vardefs (List[Element] elems) : elems.typeSelect(VariableDef);
+cached List[CPU] cpus (List[Element] elems) : elems.typeSelect(CPU);
+cached List[Resource] resources (List[Element] elems) : elems.typeSelect(Resource);
+cached List[FunctionBlock] fbs (List[Element] elems) : elems.typeSelect(FunctionBlock);
+cached List[Partitioning] partitionings (List[Element] elems) : elems.typeSelect(Partitioning);
+cached List[UseCase] usecases (List[Element] elems) : elems.typeSelect(UseCase);
+cached List[Scenario] scenarios (List[Element] elems) : elems.typeSelect(Scenario);
+
+
+// list of bound flows chains
+//cached List[FlowChain] chains (List[Flow] flows, FeatureConfig cfg) :
+//	flows.vp_chain.bind(cfg);
+
+// access to top-level elements which are really used
+/*
+cached Set[Input] usedInputs (List[Element] elems, FeatureConfig cfg) :
+	elems.flows().chains(cfg).select(c|c.input!=null).input.toSet();
+cached Set[Output] usedOutputs (List[Element] elems, FeatureConfig cfg) :
+	elems.flows().chains(cfg).select(c|c.output!=null).output.toSet();
+cached Set[FunctionBlock] usedFBs (List[Element] elems, FeatureConfig cfg) :
+	elems.flows().chains(cfg).select(c| !c.fb.isEmpty).fb.toSet();
+cached Set[CPU] usedCPUs (List[Element] elems, FeatureConfig cfg) :
+	elems.usedFBs(cfg).cpu.toSet();
+*/
+
+// bind variation points
+cached Element bind (VP_Element vp, FeatureConfig cfg) :
+	vp.sel==null ? vp.opt :
+		(vp.sel.matches(cfg) ? vp.opt : null);
+
+cached IOActivity bind (VP_IOActivity vp, FeatureConfig cfg) :
+	vp.sel==null ? vp.opt :
+		(vp.sel.matches(cfg) ? vp.opt : null);
+
+cached Mapping bind (VP_Mapping vp, FeatureConfig cfg) :
+	vp.sel==null ? vp.opt :
+		(vp.sel.matches(cfg) ? vp.opt : null);
+
+cached Expr bind (VP_Expr vp, FeatureConfig cfg) :
+	vp.must!=null ? vp.must :
+		(let idx = vp.sel.getBindingIndex(cfg) : (idx>=0 ? vp.alt.get(idx) : null));
+
+cached TriggerCall bind (VP_TriggerCall vp, FeatureConfig cfg) :
+	vp.must!=null ? vp.must :
+		(let idx = vp.sel.getBindingIndex(cfg) : (idx>=0 ? vp.alt.get(idx) : null));
+
+cached StepRef bind (VP_StepRef vp, FeatureConfig cfg) :
+	vp.must!=null ? vp.must :
+		(let idx = vp.sel.getBindingIndex(cfg) : (idx>=0 ? vp.alt.get(idx) : null));
+

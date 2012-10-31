@@ -1,0 +1,77 @@
+module workflow.generate_warp
+
+import org.eclipse.emf.mwe.utils.*
+
+var modelPath  // = "platform:/resource/com.harman.sys.interplay.viz.dot/src/com/harman/sys/interplay/viz/dot/generator/model.interplay"
+var srcGenPathRel
+var srcGenPathAbs
+
+var inputSlot = "model"
+
+var targetDir = "src-gen"
+var fileEncoding = "Cp1252"
+
+
+
+Workflow {
+	// initial setup for the Generator
+	//  - set up the root path (platformUri)
+	//  - register the Interplay Model
+	bean = StandaloneSetup {
+		platformUri = ".."
+		registerGeneratedEPackage = "com.harman.simbench.HbsimStandaloneSetup"
+		registerGeneratedEPackage = "com.harman.feamo.HbfmStandaloneSetup"
+	}
+	
+	// read in the hbsim model
+	component = org.eclipse.emf.mwe.utils.Reader {
+		uri = modelPath
+		modelSlot = inputSlot
+	}
+
+	// call the generator	
+	component = org.eclipse.xpand2.Generator {
+		expand = "templates::warp::model::Transform('${srcGenPathRel}') FOR this"
+		outlet = {
+			path = "${srcGenPathAbs}"
+		}
+		fileEncoding = fileEncoding
+	}
+	
+}
+
+
+/*
+ 
+    <!-- The model file -->
+   <property name="modelFile"/>
+
+   <!-- Where to put generated files -->
+   <property name="srcGenPathAbs"/>
+   <property name="srcGenPathRel"/>
+
+	<bean class="org.eclipse.emf.mwe.utils.StandaloneSetup" platformUri=".."/>
+
+	<!--
+	<component class="org.eclipse.emf.mwe.utils.DirectoryCleaner" directory="src-gen"/>
+	-->
+
+	<component class="org.eclipse.xtext.mwe.UriBasedReader" uri="${modelFile}">
+		<register class="com.harman.simbench.HbsimStandaloneSetup"/>
+		<register class="com.harman.feamo.HbfmStandaloneSetup"/>
+		<load slot='model' type='Model'/>
+	</component>
+
+	<component class="org.eclipse.xpand2.Generator">
+		<metaModel class="org.eclipse.xtend.typesystem.emf.EmfRegistryMetaModel"/>
+		<fileEncoding value="Cp1252"/>
+		<expand value="templates::warp::model::Transform('${srcGenPathRel}') FOR model"/>
+		<outlet path="${srcGenPathAbs}/">
+			<!--
+			<postprocessor class="org.openarchitectureware.xpand2.output.CppBeautifier"/>
+			-->
+		</outlet>
+	</component>
+ 
+ 
+ */

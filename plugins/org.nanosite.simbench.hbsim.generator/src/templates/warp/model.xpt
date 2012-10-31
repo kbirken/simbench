@@ -1,0 +1,136 @@
+«IMPORT hbsim»
+«EXTENSION templates::helpers»
+«EXTENSION templates::expressions»
+«EXTENSION templates::warp»
+«EXTENSION templates::hbsim::Extensions»
+
+«DEFINE Transform(String targetPath) FOR List[Model]»
+«this.get(0).Transform(targetPath)»
+«ENDDEFINE»
+
+«DEFINE Transform(String targetPath) FOR Model»
+
+«REM»
+	The units in the generated WarpSimulator files are:
+		- times in microsecs
+		- amounts in kByte
+		- percentage in percent*10 (e.g., 12.5% is resolved to 125)
+«ENDREM»
+
+«FILE "example_warp.txt"-»
+9
+«getAllCPUs().size+getAllResources().size»
+«FOREACH getAllCPUs() AS cpu-»
+«cpu.name» 0
+«IF cpu.needsPartitioning()-»
+  1 «cpu.partition.size»
+«FOREACH cpu.partition AS p-»
+   «p.name» «p.percentage.percent(main.config)»
+«ENDFOREACH-»
+«ELSE-»
+  0
+«ENDIF-»
+«ENDFOREACH-»
+«FOREACH getAllResources() AS r-»
+«r.shortName» «r.interface.size-»
+«FOREACH r.interface AS ri-»
+ «ri.contextSwitchingTime.percent(main.config)-»
+«ENDFOREACH»
+  0
+«ENDFOREACH-»
+«getAllPools().size»
+«FOREACH getAllPools() AS p-»
+ «p.name» «p.maximum.amount(main.config)»
+«ENDFOREACH-»
+«getAllFunctionBlocks().size»
+«FOREACH getAllFunctionBlocks() AS fb-»
+«LET fb.getPartition(this) AS part-»
+«LET fb.getCPU(this) AS cpu-»
+«IF cpu.needsPartitioning() && part!=null && part.percentage.eval(main.config)==0-»
+«ERROR "Error: fb '" + fb.name + "' is mapped to zero-sized partition '" + part.name + "'"»
+«ENDIF-»
+«fb.id()» «getAllCPUs().toList().indexOf(cpu) + 1» «part==null ? 0 : cpu.partition.indexOf(part) + 1»
+ «fb.getReachableBehaviours(this).size»
+ «FOREACH fb.getReachableBehaviours(this) AS b-»
+  «EXPAND BehaviourDefinition(this) FOR b-»
+ «ENDFOREACH-»
+«ENDLET-»
+«ENDLET-»
+«ENDFOREACH-»
+«getAllFunctionBlocks().getReachableBehaviours(this).plan.step.size»
+«FOREACH allSteps() AS s ITERATOR i-»
+	«EXPAND StepDefinition(i,this) FOR s-»
+«ENDFOREACH-»
+«getAllExternalTriggers().size»
+«FOREACH getAllExternalTriggers() AS tr-»
+«tr.fb.index(this)» «tr.trigger.index(this)»
+«ENDFOREACH-»
+«getAllReachableBehaviours().size»
+«FOREACH getAllReachableBehaviours() AS b-»
+«b.getFB().index(this)» «b.index(this)» «b.getTriggerCalls(main.config).size»
+«FOREACH b.getTriggerCalls(main.config) AS tr-»
+ «tr.fb.index(this)» «tr.trigger.index(this)»
+«ENDFOREACH-»
+«ENDFOREACH-»
+«FOREACH allSteps() AS s ITERATOR i-»
+	«EXPAND StepPreconditions(i,this) FOR s-»
+«ENDFOREACH-»
+-1
+«ENDFILE»
+«ENDDEFINE»
+
+
+«DEFINE StepDefinition(xpand2::Iterator i, Model model) FOR Step-»
+«i.counter0» «getFB().index(model)» «getBehaviour().index(model)» «id()» «milestoneType()-»
+«IF action.size==1-»
+«LET action.first() AS a-»
+ «IF a.additionalWaitTime!=null»«a.additionalWaitTime.time(model.main.config)-»«ELSE»0«ENDIF-»
+«FOREACH model.getAllCPUs() AS cpu-»
+ «IF getFB().getCPU(model)==cpu»«a.allCPU(cpu, model.main.config)»«ELSE»0«ENDIF-»
+«ENDFOREACH»
+   «FOREACH model.getAllResources().interface AS ri-»
+ «resourceTime(ri, model.main.config)-»
+«ENDFOREACH»
+   «FOREACH model.getAllPools() AS p-»
+ «poolAmount(p, model.main.config)-»
+«ENDFOREACH-»
+«ENDLET»
+«ELSE-»
+ 0 «FOREACH model.getAllCPUs() AS cpu-» 0«ENDFOREACH»
+    «FOREACH model.getAllResources().interface AS ri-» 0«ENDFOREACH»
+    «FOREACH model.getAllPools() AS p-» 0«ENDFOREACH»
+«ENDIF-»
+«ENDDEFINE»
+
+
+«DEFINE StepPreconditions(xpand2::Iterator i, Model model) FOR Step-»
+«IF preconditions(model).size > 0-»
+«i.counter0» «preconditions(model).size-»
+«FOREACH preconditions(model) AS p-»
+«LET p.index(model) AS idx-»
+«IF idx<0»«ERROR "Error: step '" + fullName() + "' has non-reachable precondition '" + p.fullName() + "'"»«ELSE-»
+ «p.index(model)-»
+«ENDIF-»
+«ENDLET-»
+«ENDFOREACH»
+«ENDIF-»
+«ENDDEFINE»
+
+
+«DEFINE BehaviourDefinition(Model model) FOR Behaviour-»
+  «id()» «token ? 1 : 0-»
+«IF repeat!=null-»
+«IF repeat.loop.round2(model.main.config)>0-»
+  1 «repeat.loop.round2(model.main.config)»
+«ELSEIF repeat.until!=null-»
+  2 0
+«ELSEIF repeat.unless!=null-»
+  3 «repeat.unless.step.index(model)»
+«ELSE-»
+  0
+«ENDIF-»
+«ELSE-»
+  0
+«ENDIF-»
+«ENDDEFINE»
+

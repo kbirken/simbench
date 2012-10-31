@@ -1,0 +1,54 @@
+// extensions for FeatureModels (hbfm)
+
+import hbfm;
+import hbsim;
+
+// **********************************************************************************
+
+// get name of a SimpleFeature
+cached String name (SimpleFeature f) :
+	f.mandatory==null ? f.optional.name : f.mandatory.name;
+
+
+// **********************************************************************************
+
+// helpers for easy implementation of variation points in derived models
+
+// get index of first matching FSelector in fsels-list according to FeatureConfig
+cached Integer getBindingIndex (List[FSelector] fsels, FeatureConfig cfg) :
+	let matched = fsels.matchSelector(cfg) :
+		matched.isEmpty ?
+			-1 :  // no matching selector found
+			fsels.indexOf(matched.first()); // if >1 match, take first
+
+// check which selector out of a list matches FeatureConfig
+cached List[FSelector] matchSelector(List[FSelector] fsels, FeatureConfig cfg) :
+	fsels.select(s|s.matches(cfg));
+
+// check if FSelector has been configured in FeatureConfig
+cached Boolean matches (FSelector fsel, FeatureConfig cfg) : fsel.expr.matches(cfg);
+
+cached Boolean matches (FSelExpr expr, FeatureConfig cfg) :
+	expr==null ? false : ((FSelOrExpr)expr).matches(cfg);
+
+cached Boolean matches (FSelOrExpr expr, FeatureConfig cfg) : expr.term.matches_or(cfg);
+cached Boolean matches_or (List[FSelAndExpr] list, FeatureConfig cfg) :
+	list.size==0 ? false :
+		(list.first().matches(cfg) ? true : list.withoutFirst().matches_or(cfg));
+
+cached Boolean matches (FSelAndExpr expr, FeatureConfig cfg) : expr.factor.matches_and(cfg);
+cached Boolean matches_and (List[FSelAtomicExpr] list, FeatureConfig cfg) :
+	list.size==0 ? true :
+		(list.first().matches(cfg) ? list.withoutFirst().matches_and(cfg) : false);
+
+cached Boolean matches (FSelAtomicExpr expr, FeatureConfig cfg) :
+	let sel = cfg.getSelected().contains(expr.feature) :
+		(expr.neg ? !sel : sel);
+
+cached List[Feature] getSelected(FeatureConfig cfg) :
+	cfg.base==null ?
+		cfg.plus.toSet().without(cfg.minus) :
+		cfg.plus.union(cfg.base.getSelected()).toSet().without(cfg.minus);
+
+
+// **********************************************************************************

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            objectClass="org.eclipse.core.resources.IFile"
+            nameFilter="*.hbsim"
+            id="org.nanosite.simbench.hbsim.generator.contribution1">
+         <action
+               label="Generate visuals and reports"
+               icon="icons/Button-Refresh-icon16.png"
+               class="org.nanosite.simbench.hbsim.generator.ui.GenerateAllAction"
+               menubarPath="org.nanosite.simbench.ide.hbsimMenu/groupSIMBENCH"
+               enablesFor="1"
+               id="org.nanosite.simbench.hbsim.generator.genAllAction">
+         </action>
+         <action
+               label="Generate chronSIM code (w/o simulation)"
+               icon="icons/Button-Refresh-icon16.png"
+               class="org.nanosite.simbench.hbsim.generator.ui.GenerateChronsimAction"
+               menubarPath="org.nanosite.simbench.ide.hbsimMenu/groupChronsim"
+               enablesFor="1"
+               id="org.nanosite.simbench.hbsim.generator.genChronsimAction">
+         </action>
+      </objectContribution>
+   </extension>
+
+</plugin>

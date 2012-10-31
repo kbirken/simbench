@@ -1,0 +1,37 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: com.harman.simbench.hbsim.generator
+Bundle-Vendor: Harman Infotainment
+Bundle-Version: 0.7.0.qualifier
+Bundle-Activator: org.nanosite.simbench.hbsim.generator.Activator
+Bundle-SymbolicName: org.nanosite.simbench.hbsim.generator; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.nanosite.simbench.hbsim;visibility:=reexport,
+ org.eclipse.xpand;visibility:=reexport,
+ org.eclipse.xtend;visibility:=reexport,
+ org.eclipse.xtext;visibility:=reexport,
+ org.eclipse.emf.mwe2.launch;resolution:=optional,
+ org.eclipse.emf.mwe.utils;visibility:=reexport,
+ org.eclipse.xtend.typesystem.emf;visibility:=reexport,
+ org.eclipse.cdt.formatter;bundle-version="4.0.4",
+ oaw.core.xpand2.extensions;bundle-version="0.4.2",
+ org.apache.commons.logging;bundle-version="1.0.4",
+ org.apache.log4j;bundle-version="1.2.15",
+ org.eclipse.ui.console;bundle-version="3.5.0",
+ org.eclipse.jface;bundle-version="3.6.0",
+ org.eclipse.core.runtime;bundle-version="3.6.0",
+ org.nanosite.feamo.hbfm;bundle-version="0.7.0",
+ org.nanosite.common.util;bundle-version="0.7.0",
+ org.eclipse.ui;bundle-version="3.6.0"
+Import-Package: org.apache.log4j,
+ org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.core.runtime.jobs,
+ org.eclipse.jface.action,
+ org.eclipse.jface.dialogs,
+ org.eclipse.jface.viewers,
+ org.eclipse.swt.widgets,
+ org.eclipse.ui
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Export-Package: org.nanosite.simbench.hbsim.generator,
+ org.nanosite.simbench.hbsim.generator.ui

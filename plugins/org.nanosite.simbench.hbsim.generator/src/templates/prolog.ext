@@ -1,0 +1,12 @@
+import hbsim;
+extension templates::helpers;
+
+// making Prolog identifiers out of strings
+cached String proId (CPU cpu) : 'c_' + cpu.name.makeId();
+cached String proId (Resource res) : 'r_' + res.name.makeId();
+cached String proId (ResourceInterface ri) : 'ri_' + ri.getResource().name.makeId() + '__' + ri.name.makeId();
+cached String proId (FunctionBlock fb) : 'fb_' + fb.name.makeId();
+cached String proId (Behaviour b) : 'b_' + b.getFB().name.makeId() + '__' + b.name.makeId();
+cached String proId (Step s) :
+	's_' + s.getFB().name.makeId() + '__' + s.getBehaviour().name.makeId() + '__' + s.name.makeId();
+

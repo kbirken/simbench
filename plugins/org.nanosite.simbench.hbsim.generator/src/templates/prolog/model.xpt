@@ -1,0 +1,135 @@
+«IMPORT hbsim»
+«EXTENSION templates::helpers»
+«EXTENSION templates::expressions»
+«EXTENSION templates::prolog»
+«EXTENSION templates::hbsim::Extensions»
+
+«DEFINE Transform(String targetPath) FOR Model»
+«FILE "model.pro"-»
+% hbsim model generated as a set of prolog clauses
+
+% all resources
+«FOREACH getAllResources() AS res-»
+resource(«res.proId()», «res.blocksize.round(main.config)»).
+«ENDFOREACH-»
+
+% all CPUs
+«FOREACH getAllCPUs() AS cpu-»
+cpu(«cpu.proId()»).
+«ENDFOREACH-»
+
+% all resource interfaces (bandwidth, inducedCPU, contextSwitchingTime)
+«FOREACH getAllResources().interface AS ri-»
+resource_interface(«ri.getResource().proId()», «ri.proId()», «ri.bandwidth.round(main.config)», «ri.inducedCPU.round(main.config)», «ri.contextSwitchingTime.round(main.config)»).
+«ENDFOREACH-»
+
+% all function blocks
+«FOREACH main.partitioning.getMappings(main.config) AS m-»
+«IF getAllFunctionBlocks().contains(m.fb)-»
+fb(«m.fb.proId()», «m.cpu.proId()»).
+«ENDIF-»
+«ENDFOREACH-»
+
+% all behaviours for each function block
+«FOREACH getAllFunctionBlocks().getReachableBehaviours(this) AS b-»
+behaviour(«b.getFB().proId()», «b.proId()»).
+«ENDFOREACH-»
+
+% the sequence of behaviours (i.e., triggers via sends)
+«FOREACH getAllFunctionBlocks().getReachableBehaviours(this) AS b-»
+«FOREACH b.getTriggerCalls(main.config) AS tr-»
+trigger(«b.proId()», «tr.trigger.proId()»).
+«ENDFOREACH-»
+«ENDFOREACH-»
+
+% the initial triggers
+«FOREACH main.scenario.usecase.getTriggerCalls(main.config) AS tr-»
+initial(«tr.trigger.proId()»).
+«ENDFOREACH-»
+
+% all steps for each behaviour
+«FOREACH getAllFunctionBlocks().getReachableBehaviours(this).plan.step AS s-»
+«LET s.action.first() AS a-»
+step(«s.getBehaviour().proId()», «s.proId()»).
+«ENDLET-»
+«ENDFOREACH-»
+
+% one action for each step (with performance data)
+«FOREACH getAllFunctionBlocks().getReachableBehaviours(this).plan.step AS s-»
+«LET s.action.first() AS a-»
+action_properties(«s.proId()», «a.consumedCPU.round(main.config)», «a.additionalWaitTime.round(main.config)»).
+«ENDLET-»
+«ENDFOREACH-»
+
+% the preconditions for each resource
+«FOREACH getAllResources() AS res-»
+«FOREACH res.getPreconditions(this) AS precon-»
+resource_precondition(«res.proId()», «precon.proId()»).
+«ENDFOREACH-»
+«ENDFOREACH-»
+
+% the sequence of steps
+«FOREACH getAllFunctionBlocks().getReachableBehaviours(this) AS b-»
+«FOREACH b.plan.step AS s-»
+«IF s!=b.plan.step.first()-»
+plan(«b.plan.step.get(b.plan.step.indexOf(s)-1).proId()», «s.proId()»).
+«ENDIF-»
+«ENDFOREACH-»
+«ENDFOREACH-»
+
+% explicit preconditions, real dependencies
+«FOREACH getAllFunctionBlocks().getReachableBehaviours(this).plan.step AS s-»
+«FOREACH s.getPreconditions(main.config) AS p-»
+«IF ! p.opt-»
+precondition(«s.proId()», «p.ref.bind(main.config).step.proId()»).
+«ENDIF-»
+«ENDFOREACH-»
+«ENDFOREACH-»
+
+% explicit preconditions, artificial dependencies (for optimize reasons)
+«FOREACH getAllFunctionBlocks().getReachableBehaviours(this).plan.step AS s-»
+«FOREACH s.getPreconditions(main.config) AS p-»
+«IF p.opt-»
+precondition_opt(«s.proId()», «p.ref.bind(main.config).step.proId()»).
+«ENDIF-»
+«ENDFOREACH-»
+«ENDFOREACH-»
+
+% io_read/4 gives I/O activities on resource interfaces for each step
+«FOREACH getAllFunctionBlocks().getReachableBehaviours(this).plan.step AS s-»
+«LET s.action.first() AS a-»
+«IF a!=null-»
+«FOREACH a.getResourceIOs(main.config) AS io-»
+io_read(«s.proId()», '«io.content»', «io.amount.eval(main.config)», «io.getInterface().proId()»).
+«ENDFOREACH-»
+«ENDIF-»
+«ENDLET-»
+«ENDFOREACH-»
+
+% the milestones from the special FunctionBlock 'MilestoneCollector'
+«FOREACH getAllFunctionBlocks() AS fb-»
+«IF fb.name.matches("MilestoneCollector")-»
+«FOREACH fb.getReachableBehaviours(this).plan.step.getPreconditions(main.config) AS pre-»
+milestone(«pre.ref.bind(main.config).step.proId()»).
+«ENDFOREACH-»
+«ENDIF-»
+«ENDFOREACH-»
+
+«ENDFILE»
+«ENDDEFINE»
+
+
+«REM»
+«DEFINE Precondition(String currentStep) FOR Precondition-»
+	«IF opt»
+		«EXPAND DependencyArrow(currentStep, "green") FOR ref.step-»
+	«ELSE»
+		«EXPAND DependencyArrow(currentStep, "blue") FOR ref.step-»
+	«ENDIF»
+«ENDDEFINE»
+
+«DEFINE DependencyArrow(String currentStep, String color) FOR Step-»
+	«getFB().id()»_«id()» -> «currentStep» [color="«color»"];
+«ENDDEFINE»
+«ENDREM»
+

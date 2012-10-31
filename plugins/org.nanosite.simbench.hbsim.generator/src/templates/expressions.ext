@@ -1,0 +1,53 @@
+import hbsim;
+
+extension templates::hbsim::Extensions;
+
+// math extensions
+Real toReal (String val) : JAVA com.harman.simbench.hbsim.generator.MathHelper.asDouble(java.lang.String);
+Integer rounded(Real value) :	JAVA com.harman.simbench.hbsim.generator.MathHelper.round(java.lang.Number);
+
+
+// expression evaluation
+Real eval (VP_Expr vp, FeatureConfig cfg) :
+	vp==null ? 0 :
+		(let expr = vp.bind(cfg):
+			expr==null ? 0 : expr.eval(cfg) // TODO null-case is a non-valid selection and should return an error
+		);
+//Real eval2 (Expr expr, FeatureConfig cfg) : expr==null ? 0 : ((AddExpr)expr).eval(cfg);
+Integer round (VP_Expr vp, FeatureConfig cfg) :
+	vp==null ? 0 :
+		(let expr = vp.bind(cfg):
+			expr==null ? 0 : expr.round2(cfg) // TODO null-case is a non-valid selection and should return an error
+		);
+Integer round2 (Expr expr, FeatureConfig cfg) : expr==null ? 0 : expr.eval(cfg).rounded();
+
+Real eval (AddExpr expr, FeatureConfig cfg) : expr.term.eval_add(expr.op, cfg);
+Real eval_add (List[MultExpr] list, List[String] op, FeatureConfig cfg) :
+	list.size==0 ? 0.0 :
+		(
+			op.first() == '+' ?
+				list.first().eval(cfg) + list.withoutFirst().eval_add(op.withoutFirst(), cfg) :
+				list.first().eval(cfg) - list.withoutFirst().eval_add(op.withoutFirst(), cfg)
+		)
+	;
+
+Real eval (MultExpr expr, FeatureConfig cfg) : expr.factor.eval_mult(expr.op, cfg);
+Real eval_mult (List[AtomicExpr] list, List[String] op, FeatureConfig cfg) :
+	list.size==0 ? 1.0 :
+		(
+			op.first() == '*' ?
+				list.first().eval(cfg) * list.withoutFirst().eval_mult(op.withoutFirst(), cfg) :
+				list.first().eval(cfg) / list.withoutFirst().eval_mult(op.withoutFirst(), cfg)
+		)
+	;
+
+Real eval (AtomicExpr expr, FeatureConfig cfg) :
+	expr.value==null ? expr.var.rhs.eval(cfg) : expr.value.toReal();
+
+
+
+// helper: compute sum of integer list
+Integer sumlist (List[Integer] list) :
+	list.size==0 ? 0 : list.first()+sumlist(list.withoutFirst());
+
+

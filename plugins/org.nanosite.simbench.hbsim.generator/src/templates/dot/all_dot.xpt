@@ -1,0 +1,268 @@
+«IMPORT hbsim»
+«EXTENSION templates::helpers»
+«EXTENSION templates::expressions»
+«EXTENSION templates::dot::dot»
+«EXTENSION templates::hbsim::Extensions»
+
+
+
+«DEFINE browserDotFile(String targetPath, FunctionBlock centerFB) FOR Model»
+«FILE "browsable/" + centerFB.fileDetailedDot()-»
+«EXPAND templates::dot::common::DotHeader FOR main-»
+«LET getAllFunctionBlocks().select(fb|fb==centerFB).toSet() AS centerFBs-»
+«LET true AS compact-»
+«EXPAND Nodes(centerFBs, compact) FOR this-»
+«LET centerFBs.getAdjacent(this) AS adjacentFBs-»
+«EXPAND Arrows(centerFBs, adjacentFBs, compact) FOR this-»
+«EXPAND Clustering(centerFBs.union(adjacentFBs), centerFBs, null, compact, true) FOR this-»
+«ENDLET-»
+«ENDLET-»
+«ENDLET-»
+«EXPAND templates::dot::common::DotFooter FOR main-»
+«ENDFILE»
+«ENDDEFINE»
+
+
+«DEFINE Nodes(Set[FunctionBlock] centerFBs, Boolean compact) FOR Model-»
+«LET centerFBs.getAdjacent(this) AS adjacentFBs-»
+	// definition of nodes for all focused function blocks
+	«FOREACH centerFBs AS fb-»
+	«EXPAND Behaviour(fb, compact, main.config) FOREACH fb.getReachableBehaviours(this)-»
+	«ENDFOREACH»
+
+	// definition of nodes for all adjacent function blocks
+	«FOREACH adjacentFBs AS fb-»
+	«LET fb.description.dot() AS desc-»
+	«fb.id()» [label="«fb.name»",URL="«fb.fileDetailed(".html")»",shape=rectangle,fillcolor=lightgrey«IF desc.length>0»,tooltip=«desc»«ENDIF»];
+	«ENDLET-»
+	«ENDFOREACH»
+«ENDLET-»
+«ENDDEFINE»
+
+
+«DEFINE Arrows(Set[FunctionBlock] centerFBs, Set[FunctionBlock] adjacentFBs, Boolean compact) FOR Model-»
+«LET centerFBs.union(adjacentFBs) AS allFBs-»
+«FOREACH allFBs AS fb-»
+	«FOREACH fb.getReachableBehaviours(this).plan.step AS s-»
+	«FOREACH s.getAccessedResources(main.config).getPreconditions(this).toSet() AS sPre-»
+		«IF centerFBs.contains(s.getFB()) || centerFBs.contains(sPre.getFB())-»
+			«EXPAND ArrowTo(s, allFBs, compact, centerFBs, "red", 5) FOR sPre-»
+		«ENDIF-»
+	«ENDFOREACH-»
+	«FOREACH s.getPreconditions(main.config) AS pre-»
+		«LET pre.ref.bind(main.config).step AS sPre-»
+		«IF centerFBs.contains(s.getFB()) || centerFBs.contains(sPre.getFB())-»
+			«EXPAND ArrowTo(s, allFBs, compact, centerFBs, pre.opt ? "green" : "blue", 5) FOR sPre-»
+		«ENDIF-»
+		«ENDLET-»
+	«ENDFOREACH-»
+	«ENDFOREACH-»
+
+	«FOREACH fb.getReachableBehaviours(this) AS b-»
+	«FOREACH b.getTriggerCalls(main.config) AS tr-»
+	«IF centerFBs.contains(b.getFB()) || centerFBs.contains(tr.trigger.getFB())-»
+	«IF allFBs.contains(tr.fb)-»
+	«b.nodeBhvrEnd(compact, centerFBs)» -> «tr.trigger.nodeBhvrStart(compact, centerFBs)-» [color="gold1",weight=7,arrowhead="vee"«IF centerFBs.contains(tr.trigger.getFB())»,lhead="«tr.trigger.clusterId()»"«ENDIF»];
+	«ENDIF-»
+	«ENDIF-»
+	«ENDFOREACH-»
+	«ENDFOREACH-»
+«ENDFOREACH»
+«ENDLET»
+«ENDDEFINE»
+
+
+
+
+«DEFINE dotFile(String targetPath, CPU detailedCPU, Boolean withScenario, Boolean compact, Boolean clusteredCPUs) FOR Model»
+«FILE detailedCPU==null ? (clusteredCPUs ? "all_dot.txt" : "all2_dot.txt") : detailedCPU.fileDetailedDot()-»
+«EXPAND templates::dot::common::DotHeader FOR main-»
+«LET detailedCPU==null ? getAllFunctionBlocks() : getAllFunctionBlocks().select(fb|fb.getCPU(this)==detailedCPU) AS center_fbs-»
+«LET detailedCPU==null ? center_fbs : center_fbs.union(center_fbs.toSet().getAdjacent(this)) AS fbs-»
+«FOREACH fbs AS fb-»
+	// definition of nodes for all behaviours of FunctionBlock «fb.id()»
+	«EXPAND Behaviour(fb, compact, main.config) FOREACH fb.getReachableBehaviours(this)-»
+«ENDFOREACH»
+
+«FOREACH fbs AS fb-»
+	«IF fb.getReachableBehaviours(this).plan.step.size>0-»
+	// preconditions for FunctionBlock «fb.id()»
+	«ENDIF-»
+	«FOREACH fb.getReachableBehaviours(this).plan.step AS s-»
+	«FOREACH s.getAccessedResources(main.config).getPreconditions(this).toSet() AS sPre-»
+	«EXPAND ArrowTo(s, fbs, compact, null, "red", 5) FOR sPre-»
+	«ENDFOREACH-»
+	«FOREACH s.getPreconditions(main.config) AS pre-»
+	«EXPAND ArrowTo(s, fbs, compact, null, pre.opt ? "green" : "blue", 5) FOR pre.ref.bind(main.config).step-»
+	«ENDFOREACH-»
+	«ENDFOREACH-»
+
+	«IF fb.getReachableBehaviours(this).send.size>0-»
+	// message dependencies for FunctionBlock «fb.id()»
+	«ENDIF-»
+	«FOREACH fb.getReachableBehaviours(this) AS b-»
+	«FOREACH b.getTriggerCalls(main.config) AS tr-»
+	«IF fbs.contains(tr.fb)-»
+	«b.nodeBhvrEnd(compact, null)» -> «tr.trigger.nodeBhvrStart(compact, null)-» [color="gold1",weight=7,arrowhead="vee",lhead="«tr.trigger.clusterId()»"];
+	«ENDIF-»
+	«ENDFOREACH-»
+	«ENDFOREACH-»
+«ENDFOREACH-»
+
+«EXPAND Clustering(fbs, fbs, detailedCPU, compact, clusteredCPUs) FOR this-»
+
+«IF withScenario»
+	«EXPAND Scenario(fbs, compact) FOR this-»
+«ENDIF»
+«ENDLET-»
+«ENDLET-»
+«EXPAND templates::dot::common::DotFooter FOR main-»
+«ENDFILE»
+«ENDDEFINE»
+
+
+
+«DEFINE Clustering(Set[FunctionBlock] allFBs, Set[FunctionBlock] detailedFBs, CPU detailedCPU, Boolean compact, Boolean clusteredCPUs) FOR Model-»
+	// one cluster for each cpu
+«FOREACH getAllCPUs() AS cpu-»
+	«LET main.partitioning.getMappings(main.config).select(m | m.cpu==cpu && allFBs.contains(m.fb)) AS mappings-»
+	«IF mappings.size>0-»
+	«LET (detailedCPU==null ? true : detailedCPU==cpu) && clusteredCPUs AS isCluster-»
+	«IF isCluster-»
+	subgraph cluster_cpu_«cpu.name» {
+		fontname="Arial";
+		fontsize=20;
+		label="«cpu.name»"; // $CPU
+		style=filled;
+		color="#c0e0e0";
+		fillcolor="#e0ffff";
+		shape=box3d;
+	«ENDIF-»
+		«EXPAND FunctionBlock(this, compact, isCluster ? "" : cpu.name, detailedFBs) FOREACH mappings.fb-»
+	«IF isCluster-»
+	}
+	«ENDIF-»
+	«ENDLET-»
+	«ENDIF-»
+	«ENDLET-»
+«ENDFOREACH»
+	// all FBs that are not mapped
+«LET allFBs.reject(x|main.partitioning.getMappings(main.config).fb.contains(x)) AS unmapped_fb»
+	«EXPAND FunctionBlock(this, compact, clusteredCPUs ? "" : "GLOBAL", detailedFBs) FOREACH unmapped_fb-»
+«ENDLET»
+«ENDDEFINE»
+
+
+
+«DEFINE Scenario(Set[FunctionBlock] fbs, Boolean compact) FOR Model-»
+	subgraph cluster_scenario {
+		fontname="Arial";
+		fontsize=14;
+		label="Scenario: «main.scenario.name»";
+		style=filled;
+		color=black;
+		fillcolor=green;
+		shape=rect;
+		«FOREACH getAllUseCases() AS uc-»
+		«uc.id()» [label="«uc.name»",shape="ellipse"];
+		«ENDFOREACH-»
+	}
+
+	«FOREACH getAllUseCases() AS uc-»
+	«FOREACH uc.getTriggerCalls(main.config) AS tr-»
+	«IF fbs.contains(tr.trigger.getFB())-»
+	«uc.id()» -> «tr.trigger.nodeBhvrStart(compact, null)» [color="gold1",weight=7,arrowhead="vee",lhead="«tr.trigger.clusterId()»"];
+	«ENDIF-»
+	«ENDFOREACH-»
+	«ENDFOREACH-»
+«ENDDEFINE»
+
+
+«DEFINE Behaviour(FunctionBlock fb, Boolean compact, FeatureConfig cfg) FOR Behaviour-»
+«IF compact-»
+	«dotId()» [label="{«FOREACH plan.step AS s SEPARATOR '|'»<«s.id()»>«s.id()»«ENDFOREACH»}", shape=record];
+«ELSE-»
+	«FOREACH plan.step AS s-»
+	«IF s.getPreconditions(cfg).size > 0-»
+	«s.dotId()» [label="«s.id()»",fillcolor="yellow"];
+	«ELSE-»
+	«s.dotId()» [label="«s.id()»"];
+	«ENDIF-»
+	«ENDFOREACH-»
+
+	«IF plan.step.size>1-»
+	// step sequence for Behaviour «fb.id()».«id()»()
+	«FOREACH plan.step AS s SEPARATOR "->"-»
+	«s.dotId()-»
+	«ENDFOREACH-»;
+	«ENDIF»
+«ENDIF-»
+«ENDDEFINE»
+
+
+
+
+«DEFINE ArrowTo (Step currentStep, Set[FunctionBlock] fbs, Boolean compact, Set[FunctionBlock] detailedFBs, String color, Integer weight) FOR Step-»
+	«IF fbs.contains(getFB())-»
+	«nodeId(compact, detailedFBs)» -> «currentStep.nodeId(compact, detailedFBs)» [color="«color»",weight=«weight»];
+	«ENDIF-»
+«ENDDEFINE»
+
+
+
+
+«DEFINE FunctionBlock(Model model, Boolean compact, String prefix, Set[FunctionBlock] detailedFBs) FOR FunctionBlock-»
+«IF detailedFBs.contains(this)-»
+	«EXPAND FunctionBlockCluster(model, compact, prefix) FOR this-»
+«ELSE-»
+	«this.name»;
+«ENDIF-»
+«ENDDEFINE»
+
+
+
+«DEFINE FunctionBlockCluster(Model model, Boolean compact, String prefix) FOR FunctionBlock-»
+		subgraph cluster_«id()» {
+			fontname="Arial";
+			fontsize=14;
+			label="«prefix.length>0 ? prefix+":\\n" : ""»«id()»";
+			style=filled;
+			color=lightgrey;
+			fillcolor=lightgrey;
+			shape=box;
+			«FOREACH getReachableBehaviours(model) AS b-»
+				«EXPAND FunctionBlockBehaviourCluster(this, compact, model.main.config) FOR b-»
+			«ENDFOREACH-»
+		}
+«ENDDEFINE»
+
+
+«DEFINE FunctionBlockBehaviourCluster(FunctionBlock fb, Boolean compact, FeatureConfig cfg) FOR Behaviour-»
+			subgraph «clusterId()» {
+				fontname="Arial";
+				fontsize=12;
+				«IF repeat!=null-»
+				«IF repeat.loop.round2(cfg)>0-»
+				label="«id()» [x«repeat.loop.round2(cfg)»]";
+				«ELSEIF repeat.until!=null-»
+				label="«id()» [until «repeat.until.id()»]";
+				«ELSEIF repeat.unless!=null-»
+				label="«id()» [unless «repeat.unless.fb.id()»::«repeat.unless.step.id()»]";
+				«ENDIF-»
+				«ELSE-»
+				label="«id()»";
+				«ENDIF-»
+				style=rounded;
+				color=white;
+				fillcolor=grey;
+				shape=box;
+				«IF compact-»
+				«dotId()»;
+				«ELSE-»
+				«FOREACH plan.step AS s-»
+				«s.dotId()»;
+				«ENDFOREACH-»
+				«ENDIF-»
+			}
+«ENDDEFINE»
+

@@ -1,0 +1,44 @@
+<workflow>
+   <!--
+   <property file="workflow/test_hbsim.properties" />
+   -->
+
+   <!-- The model file -->
+   <property name="modelFile"/>
+
+   <!-- Where to put generated files -->
+   <property name="srcGenPathAbs"/>
+   <property name="srcGenPathRel"/>
+
+   <!-- Show also current scenario and use cases -->
+   <property name="withScenario"/>
+
+   <!-- Compact representation of all_dot graph-->
+   <property name="compact"/>
+
+	<bean class="org.eclipse.emf.mwe.utils.StandaloneSetup" platformUri="..">
+		<!--
+		<uriMap from="platform:/resource/NTG5_SimuModel/src/model/hw/uri_test.hbsim" to="file:/D:/P4_NTG5_Sim/NTG5_SimuModel/src/model/hw/uri_test.hbsim"/>
+		-->
+	</bean>
+
+	<!--
+	<component class="org.eclipse.emf.mwe.utils.DirectoryCleaner" directory="src-gen"/>
+	-->
+
+	<component class="org.eclipse.xtext.MweReader" uri="${modelFile}">
+		<register class="com.harman.simbench.HbsimStandaloneSetup"/>
+		<register class="com.harman.feamo.HbfmStandaloneSetup"/>
+	</component>
+
+	<component class="org.eclipse.xpand2.Generator">
+		<metaModel class="org.eclipse.xtend.typesystem.emf.EmfRegistryMetaModel"/>
+		<fileEncoding value="Cp1252"/>
+		<expand value="templates::dot::model::Transform('${srcGenPathRel}', ${withScenario}, ${compact}) FOR model"/>
+		<outlet path="${srcGenPathAbs}/">
+			<!--
+			<postprocessor class="org.openarchitectureware.xpand2.output.CppBeautifier"/>
+			-->
+		</outlet>
+	</component>
+</workflow>

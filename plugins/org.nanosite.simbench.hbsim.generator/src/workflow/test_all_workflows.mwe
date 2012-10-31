@@ -1,0 +1,41 @@
+<workflow>
+   <property file="workflow/test_hbsim.properties" />
+
+   <!-- The model file -->
+   <property name="modelFile"/>
+
+   <!-- Where to put generated files -->
+   <property name="srcGenPath"/>
+
+   <!-- start generation of dependency graph in dot/graphviz format -->
+   <component file="workflow/generate_dot.mwe" inheritAll="true" withScenario="true" compact="true">
+	   <property name="srcGenPath" value="src-gen/dot"/>
+   </component>
+<!--	
+-->
+
+   <!-- start generation of various reports in ascii format -->
+   <component file="workflow/generate_reports.mwe" inheritAll="true">
+	   <property name="srcGenPath" value="src-gen/reports"/>
+   </component>
+<!--	
+-->
+
+   <!-- start generation of chronSim code -->
+   <component file="workflow/generate_chronsim.mwe" inheritAll="true">
+	   <property name="srcGenPath" value="src-gen/dot"/>
+   </component>
+<!--	
+-->
+   
+   <!-- start generation of prolog clauses for further analysis -->
+<!--	
+   <component file="workflow/generate_prolog.mwe" inheritAll="true"/>
+-->
+
+   <!-- start generation of model for warp simulator -->
+   <component file="workflow/generate_warp.mwe" inheritAll="true"/>
+<!--	
+-->
+
+</workflow>

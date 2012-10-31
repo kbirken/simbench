@@ -1,0 +1,13 @@
+import hbfm;
+import hbsim;
+
+//extension templates::feature_model;
+
+// Java extensions for access to _all_ model elements
+// (even those imported from other files and not referenced from main file)
+FeatureModel getFeatureModel(hbsim::Model main) :
+	JAVA com.harman.simbench.HbsimModelAccessor.getFeatureModel(com.harmanbecker.simbench.hbsim.Model);
+List[FeatureConfig] getConfigs(hbsim::Model main) :
+	JAVA com.harman.simbench.HbsimModelAccessor.getConfigs(com.harmanbecker.simbench.hbsim.Model);
+List[VP_Element] getVPElements(hbsim::Model main) :
+	JAVA com.harman.simbench.HbsimModelAccessor.getVPElements(com.harmanbecker.simbench.hbsim.Model);

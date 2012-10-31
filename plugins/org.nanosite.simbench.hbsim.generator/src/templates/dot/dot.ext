@@ -1,0 +1,62 @@
+import hbsim;
+
+extension templates::helpers;
+extension templates::hbsim::Extensions;
+
+
+// get filename(s)
+cached String fileDetailed (CPU cpu, String ext) : "details_" + cpu.name + ext;
+cached String fileDetailedDot (CPU cpu) : cpu.fileDetailed("_dot.txt");
+cached String fileDetailed (FunctionBlock fb, String ext) : "browsable_" + fb.name + ext;
+cached String fileDetailedDot (FunctionBlock fb) : fb.fileDetailed("_dot.txt");
+
+
+// get descriptive title for dot file
+cached String title(Main main) :
+	"Partitioning '" + main.partitioning.name + "'" +
+	" - Scenario '" + main.scenario.name + "'" +
+	" - Configuration '" + main.config.name + "'";
+
+
+// making identifiers for nodes in dot file
+cached String dotId(Behaviour b) : b.getFB().id() + "__" + b.id();
+cached String dotId(Step s) : s.getFB().id() + "__" + s.getBehaviour().id() + "__" + s.id();
+cached String clusterId(Behaviour b) : "cluster_" + b.getFB().id() + "__" + b.id();
+
+
+// get all Steps of one FunctionBlock
+cached Set[Step] getSteps (FunctionBlock fb, Model model) :
+	fb.getReachableBehaviours(model).plan.step.toSet();
+
+// get preconditions on FunctionBlock level
+cached Set[FunctionBlock] getResourcePreconditionFBs (FunctionBlock fb, Model model) :
+	fb.getSteps(model).getAccessedResources(model.main.config).getPreconditions(model).getFB().toSet();
+
+
+// addressing of nodes for link begins/ends
+cached String detailedNodeId(Step s, Boolean compact) :
+	compact ?
+		s.getBehaviour().dotId() + ":" + s.id() :
+		s.dotId();
+cached String nodeId(Step s, Boolean compact, Set[FunctionBlock] detailedFBs) :
+	detailedFBs!=null && !detailedFBs.contains(s.getFB()) ?
+		s.getFB().id() :
+		s.detailedNodeId(compact);
+cached String nodeBhvrStart(Behaviour b, Boolean compact, Set[FunctionBlock] detailedFBs) :
+	false ? b.dotId() :	b.plan.step.first().nodeId(compact, detailedFBs);
+cached String nodeBhvrEnd(Behaviour b, Boolean compact, Set[FunctionBlock] detailedFBs) :
+	b.plan.step.last().nodeId(compact, detailedFBs);
+
+
+// compute adjacent function blocks (those which have arrows to/from the input function blocks)
+cached Boolean isAdjacent (FunctionBlock fb, Set[FunctionBlock] fbs, Model model) :
+	fbs.intersect(fb.getReachableBehaviours(model).toSet().directSuccessors(model.main.config).getFB()).size>0 ||
+	fbs.getReachableBehaviours(model).toSet().directSuccessors(model.main.config).getFB().contains(fb) ||
+	fbs.getReachableBehaviours(model).plan.step.getPreconditions(model.main.config).ref.bind(model.main.config).step.getFB().contains(fb) ||
+	fb.getReachableBehaviours(model).plan.step.getPreconditions(model.main.config).ref.bind(model.main.config).step.getFB().intersect(fbs).size>0 ||
+	fb.getReachableBehaviours(model).plan.step.getAccessedResources(model.main.config).getPreconditions(model).getFB().toSet().intersect(fbs).size>0 ||
+	fbs.getReachableBehaviours(model).plan.step.getAccessedResources(model.main.config).getPreconditions(model).getFB().toSet().intersect(fbs).size>0;
+
+cached Set[FunctionBlock] getAdjacent (Set[FunctionBlock] fbs, Model model) :
+	model.getAllFunctionBlocks().select(fb|fb.isAdjacent(fbs, model)).toSet().without(fbs);
+
