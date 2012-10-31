@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="Sample Category"
+            id="org.nanosite.simbench.ide">
+      </category>
+      <view
+            name="System Model"
+            icon="icons/Find-icon16.png"
+            category="org.nanosite.simbench.ide"
+            class="org.nanosite.simbench.ide.views.SystemModelView"
+            id="org.nanosite.simbench.ide.views.SystemModelView">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml">
+      </contexts>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            objectClass="org.eclipse.core.resources.IFile"
+            nameFilter="*.hbsim"
+            id="org.nanosite.simbench.ide.actions.contribution1">
+         <menu
+               label="SIMBENCH"
+               icon="icons/Find-icon16.png"
+               path="additions"
+               id="org.nanosite.simbench.ide.hbsimMenu">
+            <separator
+                  name="groupSIMBENCH">
+            </separator>
+            <separator
+                  name="groupChronsim">
+            </separator>
+         </menu>
+         <action
+               class="org.nanosite.simbench.ide.actions.DoWarpSimulationAction"
+               enablesFor="1"
+               id="org.nanosite.simbench.ide.actions.warpAction"
+               label="Start warp simulation"
+               icon="icons/Button-Play-icon16.png"
+               menubarPath="org.nanosite.simbench.ide.hbsimMenu/groupSIMBENCH">
+         </action>
+         <action
+               class="org.nanosite.simbench.ide.actions.DoChronsimBatchSimulationAction"
+               enablesFor="1"
+               id="org.nanosite.simbench.ide.actions.chronsimBatchAction"
+               label="Start chronSIM simulation as batch"
+               menubarPath="org.nanosite.simbench.ide.hbsimMenu/groupChronsim">
+         </action>
+      </objectContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+         <page id="org.nanosite.simbench.ide.preferences.Page1"
+               class="org.nanosite.simbench.ide.preferences.PreferencesPage"
+               name="SIMBENCH">
+         </page>
+   </extension>
+
+</plugin>
