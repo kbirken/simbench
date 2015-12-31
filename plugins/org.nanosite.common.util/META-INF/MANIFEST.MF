@@ -4,11 +4,11 @@ Bundle-Name: org.nanosite.common.util
 Bundle-SymbolicName: org.nanosite.common.util
 Bundle-Version: 0.7.0.qualifier
 Bundle-Activator: org.nanosite.common.util.Activator
-Bundle-Vendor: Harman Infotainment
+Bundle-Vendor: itemis AG
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui.console;bundle-version="3.5.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: org.nanosite.common.util.file,
  org.nanosite.common.util.graphviz,

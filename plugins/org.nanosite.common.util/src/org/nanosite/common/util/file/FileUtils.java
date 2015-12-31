@@ -20,13 +20,17 @@ public class FileUtils {
 
 	public static boolean copy (String sourcefile, String destfile) {
 		FileChannel in = null, out = null;
+		FileInputStream instream = null;
+		FileOutputStream outstream = null;
 		boolean ok = false;
 		try {
 			File infile = new File(sourcefile);
 			File outfile = new File(destfile);
 
-			in = new FileInputStream(infile).getChannel();
-			out = new FileOutputStream(outfile).getChannel();
+			instream = new FileInputStream(infile);
+			outstream = new FileOutputStream(outfile);
+			in = instream.getChannel();
+			out = outstream.getChannel();
 
 			long size = in.size();
 			MappedByteBuffer buf = in.map(FileChannel.MapMode.READ_ONLY, 0, size);
@@ -34,13 +38,15 @@ public class FileUtils {
 			ok = true;
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-
-		try {
-			if (in != null) in.close();
-			if (out != null) out.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} finally {
+			try {
+				if (in != null) in.close();
+				if (out != null) out.close();
+				instream.close();
+				outstream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 		return ok;
