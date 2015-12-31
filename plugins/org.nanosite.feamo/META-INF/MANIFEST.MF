@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.nanosite.feamo
+Bundle-Vendor: itemis AG
+Bundle-Version: 0.7.0.qualifier
+Bundle-SymbolicName: org.nanosite.feamo; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.xtext,
+ org.eclipse.xtext.xbase,
+ org.eclipse.equinox.common;bundle-version="3.5.0",
+ org.eclipse.emf.ecore,
+ org.eclipse.xtext.util,
+ org.antlr.runtime,
+ org.eclipse.xtend.lib,
+ org.eclipse.emf.common,
+ org.eclipse.xtext.xbase.lib
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: org.nanosite.feamo.generator,
+ org.nanosite.feamo.feaMo.impl,
+ org.nanosite.feamo.validation,
+ org.nanosite.feamo.feaMo,
+ org.nanosite.feamo.parser.antlr.internal,
+ org.nanosite.feamo.feaMo.util,
+ org.nanosite.feamo.services,
+ org.nanosite.feamo.parser.antlr,
+ org.nanosite.feamo,
+ org.nanosite.feamo.scoping,
+ org.nanosite.feamo.serializer
+Import-Package: org.apache.log4j

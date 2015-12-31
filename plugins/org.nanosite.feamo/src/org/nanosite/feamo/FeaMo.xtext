@@ -1,0 +1,72 @@
+/*******************************************************************************
+ * Copyright (c) 2015 itemis AG (http://www.itemis.de).
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *******************************************************************************/
+grammar org.nanosite.feamo.FeaMo with org.eclipse.xtext.common.Terminals
+
+generate feaMo "http://www.nanosite.org/feamo/FeaMo"
+
+// *****************************************************************************
+
+Model :
+	(featureModels+=FeatureModel)*
+	(configs+=FeamoFeatureConfig)*
+	;
+
+// *****************************************************************************
+
+// definition of feature models including additional constraints (excludes/requires)
+
+FeatureModel :
+	'feature_model' name=ID '{'
+		details=FeatureDetails ';'
+		(defs+=FeatureDef)*
+		(constraints+=FeatureConstraint)*
+	'}';
+
+FeatureDetails :
+	(groups+=FeatureGroup)+;
+
+FeatureGroup :
+	simple=SimpleFeature |
+	'(' alt+=SimpleFeature ('|' alt+=SimpleFeature)+ ')' |
+	'(' or+=SimpleFeature ('+' or+=SimpleFeature)+ ')'
+	;
+
+SimpleFeature :
+	mandatory=Feature |
+	'[' optional=Feature ']';
+
+Feature :
+	name=ID;
+
+FeatureDef :
+	feature=[Feature|ID] ':' details=FeatureDetails ';';
+
+FeatureConstraint :
+	feature1=[Feature|ID] rel=('requires'|'excludes') feature2=[Feature|ID] ';';
+
+
+// *****************************************************************************
+
+// FSelector needed for implementing variation points in derived models
+
+FeamoFSelector :
+	':' feature+=[Feature|ID] ('|' feature+=[Feature|ID])* ':';
+
+
+// *****************************************************************************
+
+// FeatureConfig defines instances of the FeatureModel
+
+FeamoFeatureConfig :
+	'configuration' name=ID 'for' fm=[FeatureModel|ID]
+	'{'
+		(selected+=[Feature|ID] ('+' selected+=[Feature|ID])*)?
+	'}';
+
+
+// *****************************************************************************
