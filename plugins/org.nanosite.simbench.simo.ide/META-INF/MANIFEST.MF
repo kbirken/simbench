@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.nanosite.simbench.simo.ide
+Bundle-Vendor: itemis AG
+Bundle-Version: 0.7.0.qualifier
+Bundle-SymbolicName: org.nanosite.simbench.simo.ide; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.nanosite.simbench.simo,
+ org.eclipse.xtext.ide,
+ org.eclipse.xtext.xbase.ide
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

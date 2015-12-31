@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.nanosite.simbench.simo.ui.tests
+Bundle-Vendor: itemis AG
+Bundle-Version: 0.7.0.qualifier
+Bundle-SymbolicName: org.nanosite.simbench.simo.ui.tests; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.nanosite.simbench.simo.ui,
+ org.junit;bundle-version="4.7.0",
+ org.eclipse.xtext.junit4,
+ org.eclipse.xtext.xbase.junit
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

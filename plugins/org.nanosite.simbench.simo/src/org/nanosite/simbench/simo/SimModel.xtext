@@ -1,0 +1,9 @@
+grammar org.nanosite.simbench.simo.SimModel with org.eclipse.xtext.common.Terminals
+
+generate simModel "http://www.nanosite.org/simbench/simo/SimModel"
+
+Model:
+	greetings+=Greeting*;
+	
+Greeting:
+	'Hello' name=ID '!';
