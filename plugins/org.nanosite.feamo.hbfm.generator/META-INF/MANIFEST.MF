@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: org.nanosite.feamo.hbfm.generator
-Bundle-Vendor: Harman Infotainment
+Bundle-Vendor: itemis AG
 Bundle-Version: 0.7.0.qualifier
 Bundle-SymbolicName: org.nanosite.feamo.hbfm.generator; singleton:=true
 Bundle-ActivationPolicy: lazy
@@ -20,4 +20,4 @@ Require-Bundle: org.nanosite.feamo.hbfm;visibility:=reexport,
  org.nanosite.common.util
 Import-Package: org.nanosite.common.util.graphviz,
  org.apache.log4j
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

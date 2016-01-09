@@ -9,6 +9,7 @@
 			default="true"
 			extensions="fmd"
 			id="org.nanosite.feamo.FeaMo"
+            icon="icons/Cherry-icon16.png"
 			name="FeaMo Editor">
 		</editor>
 	</extension>
