@@ -3,9 +3,8 @@ package org.nanosite.simbench.ide.actions;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.console.MessageConsoleStream;
-
-import org.nanosite.simbench.hbsim.generator.ui.GenerateChronsimAction;
 import org.nanosite.simbench.backend.chronsim.ChronsimRunner;
+import org.nanosite.simbench.simo.generator.ui.GenerateChronsimAction;
 
 public class DoChronsimBatchSimulationAction extends GenerateChronsimAction {
 

@@ -27,13 +27,13 @@
          point="org.eclipse.ui.popupMenus">
       <objectContribution
             objectClass="org.eclipse.core.resources.IFile"
-            nameFilter="*.hbsim"
+            nameFilter="*.smd"
             id="org.nanosite.simbench.ide.actions.contribution1">
          <menu
                label="SIMBENCH"
                icon="icons/Find-icon16.png"
                path="additions"
-               id="org.nanosite.simbench.ide.hbsimMenu">
+               id="org.nanosite.simbench.ide.simoMenu">
             <separator
                   name="groupSIMBENCH">
             </separator>
@@ -47,14 +47,14 @@
                id="org.nanosite.simbench.ide.actions.warpAction"
                label="Start warp simulation"
                icon="icons/Button-Play-icon16.png"
-               menubarPath="org.nanosite.simbench.ide.hbsimMenu/groupSIMBENCH">
+               menubarPath="org.nanosite.simbench.ide.simoMenu/groupSIMBENCH">
          </action>
          <action
                class="org.nanosite.simbench.ide.actions.DoChronsimBatchSimulationAction"
                enablesFor="1"
                id="org.nanosite.simbench.ide.actions.chronsimBatchAction"
                label="Start chronSIM simulation as batch"
-               menubarPath="org.nanosite.simbench.ide.hbsimMenu/groupChronsim">
+               menubarPath="org.nanosite.simbench.ide.simoMenu/groupChronsim">
          </action>
       </objectContribution>
    </extension>

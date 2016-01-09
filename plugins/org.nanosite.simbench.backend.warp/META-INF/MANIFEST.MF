@@ -4,11 +4,11 @@ Bundle-Name: org.nanosite.simbench.backend.warp
 Bundle-SymbolicName: org.nanosite.simbench.backend.warp
 Bundle-Version: 0.7.0.qualifier
 Bundle-Activator: org.nanosite.simbench.backend.warp.Activator
-Bundle-Vendor: Harman Infotainment
+Bundle-Vendor: itemis AG
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.nanosite.common.util;bundle-version="0.7.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: org.eclipse.ui.console
 Export-Package: org.nanosite.simbench.backend.warp;uses:="org.eclipse.ui.console,org.eclipse.ui.plugin,org.osgi.framework"

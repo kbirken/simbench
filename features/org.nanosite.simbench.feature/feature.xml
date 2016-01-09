@@ -3,14 +3,14 @@
       id="org.nanosite.simbench.feature"
       label="SIMBENCH Feature"
       version="0.7.0.qualifier"
-      provider-name="Harman Infotainment">
+      provider-name="itemis AG">
 
    <description>
-      SIMBENCH - Eclipse-based tool for modeling and simulation of infotainment systems.
+      SIMBENCH - Eclipse-based tool for modeling and simulation of embedded systems.
    </description>
 
    <copyright>
-      (c) 2012 Harman Infotainment
+      (c) 2016 itemis AG
    </copyright>
 
    <license url="">
@@ -43,7 +43,7 @@
       <import plugin="org.eclipse.xtext.ui.shared"/>
       <import plugin="org.eclipse.xtext.builder"/>
       <import plugin="org.nanosite.common.util" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.nanosite.feamo.hbfm" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.nanosite.feamo" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.jobs"/>
       <import plugin="org.eclipse.cdt.formatter" version="4.0.4" match="greaterOrEqual"/>
       <import plugin="oaw.core.xpand2.extensions" version="0.4.2" match="greaterOrEqual"/>
@@ -51,13 +51,13 @@
       <import plugin="org.apache.log4j" version="1.2.15" match="greaterOrEqual"/>
       <import plugin="org.eclipse.swt"/>
       <import plugin="org.eclipse.xtext" version="1.0.1" match="greaterOrEqual"/>
-      <import plugin="org.nanosite.simbench.hbsim" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.nanosite.simbench.simo" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.nanosite.simbench.injection.hbinj" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.xtext.ui" version="1.0.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.xtext.ui.shared" version="1.0.1" match="greaterOrEqual"/>
       <import plugin="org.nanosite.simbench.injection.hbinj.ui" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.nanosite.systemmodel" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.nanosite.simbench.hbsim.generator" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.nanosite.simbench.simo.generator" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.nanosite.simbench.warp" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.nanosite.simbench.chronsim" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.edit"/>
@@ -75,42 +75,42 @@
    </requires>
 
    <plugin
-         id="org.nanosite.feamo.hbfm"
+         id="org.nanosite.feamo"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.nanosite.feamo.hbfm.generator"
+         id="org.nanosite.feamo.generator"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.nanosite.feamo.hbfm.ui"
+         id="org.nanosite.feamo.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.nanosite.simbench.hbsim"
+         id="org.nanosite.simbench.simo"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.nanosite.simbench.hbsim.generator"
+         id="org.nanosite.simbench.simo.generator"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.nanosite.simbench.hbsim.ui"
+         id="org.nanosite.simbench.simo.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"

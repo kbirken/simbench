@@ -13,7 +13,7 @@
           classpathref="mwe2.classpath"
           fork="true"
       	 dir="${basedir}">
-   		 <arg value="src/com/harman/feamo/GenerateHbfm.mwe2"/>
+   		 <arg value="src/org/nanosite/feamo/GenerateFeaMo.mwe2"/>
    		 <jvmarg value="-Xmx512M"/>
    	</java>
    	<!-- Refresh whole workspace after generate -->

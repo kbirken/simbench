@@ -122,8 +122,8 @@ public class DBTableProxy {
 		return rows.get(indexMap.get(obj));
 	}
 
-	private static String dbURI = "jdbc:mysql://modeler.harmanbecker.com:3306/hbsystemmodel";
-	private static String dbUser = "HBSystemModel";
+	private static String dbURI = "jdbc:mysql://modeler.itemis.de:3306/hbsystemmodel";
+	private static String dbUser = "MySystemModel";
 	private static String dbPW = "nero";
 
 	public void reload() {
@@ -138,7 +138,7 @@ public class DBTableProxy {
 			Class.forName("com.mysql.jdbc.Driver");
 			cn = DriverManager.getConnection(dbURI, dbUser, dbPW);
 			st = cn.createStatement();
-			rs = st.executeQuery("SELECT ID,NAME FROM hbsm_" + tablename + " ORDER BY name ASC");
+			rs = st.executeQuery("SELECT ID,NAME FROM prefix_" + tablename + " ORDER BY name ASC");
 
 			// get meta data
 			//ResultSetMetaData rsmd = rs.getMetaData();
@@ -169,7 +169,7 @@ public class DBTableProxy {
 			Class.forName("com.mysql.jdbc.Driver");
 			cn = DriverManager.getConnection(dbURI, dbUser, dbPW);
 			st = cn.createStatement();
-			rs = st.executeQuery("SELECT " + name + " FROM hbsm_" + tablename + " WHERE ID=" + id);
+			rs = st.executeQuery("SELECT " + name + " FROM prefix_" + tablename + " WHERE ID=" + id);
 
 			if (rs.next()) {
 				val = rs.getString(1);
@@ -195,7 +195,7 @@ public class DBTableProxy {
 			Class.forName("com.mysql.jdbc.Driver");
 			cn = DriverManager.getConnection(dbURI, dbUser, dbPW);
 			st = cn.createStatement();
-			rs = st.executeQuery("SELECT " + name + " FROM hbsm_" + tablename + " WHERE ID=" + id);
+			rs = st.executeQuery("SELECT " + name + " FROM prefix_" + tablename + " WHERE ID=" + id);
 
 			if (rs.next()) {
 				val = rs.getInt(1);

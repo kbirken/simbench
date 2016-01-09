@@ -3,5 +3,5 @@ Bundle-ManifestVersion: 2
 Bundle-Name: org.nanosite.simbench.ide.doc
 Bundle-SymbolicName: org.nanosite.simbench.ide.doc;singleton:=true
 Bundle-Version: 0.7.0.qualifier
-Bundle-Vendor: Harman Infotainment
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-Vendor: itemis AG
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

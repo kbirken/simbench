@@ -16,7 +16,7 @@ import org.eclipse.ui.console.MessageConsoleStream;
 public class GraphvizWrapper {
 
 	// the preferences key
-	public static String ID_GRAPHVIZ_PATH = "com.harman.simbench.ide.graphviz_path";
+	public static String ID_GRAPHVIZ_PATH = "org.nanosite.simbench.ide.graphviz_path";
 
 	// output formats
 	public final static int FORMAT_GIF = 1;
@@ -63,7 +63,7 @@ public class GraphvizWrapper {
 	// ensure dot.exe tool is available
 	private static String getDotPath (MessageConsoleStream err) {
 		IPreferencesService service = Platform.getPreferencesService();
-		String graphvizDir = service.getString("com.harman.simbench.ide", ID_GRAPHVIZ_PATH, "", null);
+		String graphvizDir = service.getString("org.nanosite.simbench.ide", ID_GRAPHVIZ_PATH, "", null);
 		String dotPath = graphvizDir + "/dot.exe";
 
 		File dotFile = new File(dotPath);

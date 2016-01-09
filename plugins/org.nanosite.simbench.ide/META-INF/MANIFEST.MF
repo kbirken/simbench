@@ -4,14 +4,14 @@ Bundle-Name: org.nanosite.simbench.ide
 Bundle-SymbolicName: org.nanosite.simbench.ide; singleton:=true
 Bundle-Version: 0.7.0.qualifier
 Bundle-Activator: org.nanosite.simbench.ide.Activator
-Bundle-Vendor: Harman Infotainment
+Bundle-Vendor: itemis AG
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.nanosite.systemmodel;bundle-version="0.7.0",
- org.nanosite.simbench.hbsim.generator;bundle-version="0.7.0",
+ org.nanosite.simbench.simo.generator;bundle-version="0.7.0",
  org.nanosite.simbench.backend.warp;bundle-version="0.7.0",
  org.nanosite.simbench.backend.chronsim;bundle-version="0.7.0",
- org.nanosite.common.util;bundle-version="0.7.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+ org.nanosite.common.util;bundle-version="0.7.0",
+ org.nanosite.systemmodel;bundle-version="0.7.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: org.eclipse.ui.console

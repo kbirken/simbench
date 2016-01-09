@@ -1,17 +1,17 @@
 h1. SIMBENCH IDE Usage
 
-This page gives a short overview of the main editors and views of the SIMBENCH IDE and their corresponding mouse and keyboard features. More documentation will be provided soon - especially documentation about the hbsim language and the various generators will be provided.
+This page gives a short overview of the main editors and views of the SIMBENCH IDE and their corresponding mouse and keyboard features. More documentation will be provided soon - especially documentation about the smd language and the various generators will be provided.
 
 h2. General info about SIMBENCH IDE
 
-The SIMBENCH IDE is an Eclipse-based application (Eclipse Helios with Xtext 1.0.1). It contains all plugins necessary for working with the set of domain-specific languages hbsim, hbfm and hbinj. There is a SIMBENCH-perspective which defines the views and editors which should be used and their default location inside the IDE.
+The SIMBENCH IDE is an Eclipse-based application (Eclipse Mars with Xtext 2.9). It contains all plug-ins necessary for working with the set of domain-specific languages SimModel (smd), FeaMo (fmd) and Inject (inj). There is a SIMBENCH-perspective which defines the views and editors which should be used and their default location inside the IDE.
 
 * The standard **Project Explorer** view of Eclipse can be used to navigate the project code.
 
 
-h2.  hbsim Editor
+h2.  smd Editor
 
-The hbsim editor is the main tool for the modeler. It edits hbsim-files, i.e., the actual simulation model parts. The hbsim DSL will be documented separately.
+The smd editor is the main tool for the modeler. It edits smd-files, i.e., the actual simulation model parts. The smd DSL will be documented separately.
 
 Usage features of the SIMBENCH editor:
 
@@ -22,7 +22,7 @@ Usage features of the SIMBENCH editor:
 * Use CTRL-SPACE anywhere to get SIMBENCH-specific content assist.
 * Validation errors are shown if syntax on semantics issues exist. Validation errors are red circles with a white cross in it (as usual with Eclipse code editors). Validation errors must be cleaned up before code generation can be started.
 * Validation warnings (yellow triangles) shouldn't be ignored either.
-* Jump to definition/declaration by clicking on an item in the editor and pressing F3. This even works across languages (F3 after clicking on a feature name will jump to the corresponding hbfm file).
+* Jump to definition/declaration by clicking on an item in the editor and pressing F3. This even works across languages (F3 after clicking on a feature name will jump to the corresponding fmd file).
 * For some validation errors, quick fixes are available. Click in the line where the error is located, press CTRL-1. This opens the quick fix pop-up. Select the appropriate quick fix.
 
 h2. Timeline view

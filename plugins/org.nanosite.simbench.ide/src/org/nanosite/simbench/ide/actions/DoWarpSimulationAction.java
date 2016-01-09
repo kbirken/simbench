@@ -4,11 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.ui.console.MessageConsoleStream;
-
 import org.nanosite.common.util.graphviz.GraphvizWrapper;
-import org.nanosite.simbench.hbsim.generator.ui.GeneratorRunner;
-import org.nanosite.simbench.hbsim.generator.ui.GenericGenerateAction;
 import org.nanosite.simbench.backend.warp.WarpRunner;
+import org.nanosite.simbench.simo.generator.ui.GeneratorRunner;
+import org.nanosite.simbench.simo.generator.ui.GenericGenerateAction;
 
 public class DoWarpSimulationAction extends GenericGenerateAction {
 
@@ -25,7 +24,7 @@ public class DoWarpSimulationAction extends GenericGenerateAction {
         properties.put("srcGenPathRel", srcGenPathRel);
         properties.put("srcGenPathAbs", projectPath + "/" + srcGenPathRel);
 
-        String mweFile = "workflow/generate_warp.mwe";
+        String mweFile = "workflow/generate_warp.mwe2";
         boolean ok = new GeneratorRunner(shell, out, err).run(mweFile, properties);
 
         if (ok) {

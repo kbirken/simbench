@@ -1,17 +1,17 @@
-h1. Hbsim language reference
+h1. smd language reference
 
-The _hbsim_ domain-specific language provides the vocabulary for modeling the structure and dynamic behavior of distributed embedded systems, e.g. Automotive/Infotainment systems. This document describes the complete _hbsim_ language.
+The _smd_ domain-specific language provides the vocabulary for modeling the structure and dynamic behavior of distributed embedded systems, e.g. Automotive/Infotainment systems. This document describes the complete _smd_ language.
 
 
-h2. Overall structure of hbsim models
+h2. Overall structure of smd models
 
-A _hbsim_ model can be distributed over multiple files. Each file consists of a set of @import@-statements, an optional reference to some feature model and a list of various model elements.
+A _smd_ model can be distributed over multiple files. Each file consists of a set of @import@-statements, an optional reference to some feature model and a list of various model elements.
 
 h3. Conceptual structure of models
 
-Each model has a _layered_ structure. The layers do not appear explicitly in the _hbsim_ files, but offer a conceptual super-structure which guides you through a model. All model elements of one layer will only refer to model elements which are either in the same layer or in underlying layers. The following list explains those layers from top to bottom:
+Each model has a _layered_ structure. The layers do not appear explicitly in the _smd_ files, but offer a conceptual super-structure which guides you through a model. All model elements of one layer will only refer to model elements which are either in the same layer or in underlying layers. The following list explains those layers from top to bottom:
 * _Root layer_
-** This layer consists of exactly one @main@-section, which is the root of the _hbsim_ model. It refers to the following three elements:
+** This layer consists of exactly one @main@-section, which is the root of the _smd_ model. It refers to the following three elements:
 *** a reference to a @partitioning@ from the configuration layer.
 *** a reference to a @scenario@ from the configuration layer.
 *** a reference to a @configuration@ from the configuration layer.
@@ -41,38 +41,38 @@ Each model has a _layered_ structure. The layers do not appear explicitly in the
 ** Alloc/free resources are defined by the keyword @pool@.
 * _Feature layer_
 ** This layer contains exactly one instance of type @feature_model@. This element describes a hierarchical _feature model_.
-** It is not defined with _hbsim_ file format, but with the _hbfm_ file format instead.
-** The feature model used by a _hbsim_ model has to be imported by the _hbsim_ files using the @import@-statement.
+** It is not defined with _smd_ file format, but with the _fmd_ file format instead.
+** The feature model used by a _smd_ model has to be imported by the _smd_ files using the @import@-statement.
 
-Usually, the model is split across multiple files. As a general guideline, it is helpful if no _hbsim_ file contains elements of more than one layer in order to emphasize the conceptual layering structure. The following sections in this language reference will describe all terms and elements mentioned above in more detail.
+Usually, the model is split across multiple files. As a general guideline, it is helpful if no _smd_ file contains elements of more than one layer in order to emphasize the conceptual layering structure. The following sections in this language reference will describe all terms and elements mentioned above in more detail.
 
 
-h2. Overall structure of hbsim files
+h2. Overall structure of smd files
 
-This section lists the general contents of an _hbsim_ file, in the same order as they appear in the file.
+This section lists the general contents of an _smd_ file, in the same order as they appear in the file.
 
 h3. Importing other model files
 
 Each file starts with a set of @import@-statements, which are used to reference additional model files. Usually, these files contain model elements which are referenced later on in this file. According to the layer structure defined above, the referenced files will contain model elements which are either in the same conceptual layer or in one of the underlying layers. Example of an @import@-statement:
 
-bc. import "platform:/resource/Project/src/model/arm7.hbsim";
+bc. import "platform:/resource/Project/src/model/arm7.smd";
 
 The imported file is referenced by a standard URI (i.e., Uniform Resource Identifier); its syntax is determined by the URI types supported by EMF. Examples are @file:@-URIs used for referencing files in the filesystem and @platform:@-URIs used for referencing files in the Eclipse workspace (i.e., projects in SIMBENCH's Package Explorer. The Eclipse workbench will try to resolve the URIs and validation errors will show up if the imported file cannot be found.
 
 h3. Feature model reference
 
-The _hbsim_ language supports powerful variant handling, which allows to create a generic model and select specific instances of that model by creating configurations from predefined feature sets. In order to use this technology, features have to be referenced from various spots inside the model. All of those features have to be defined in a _feature model_, which is defined in a _hbfm_-file. _hbfm_ is a separate domain-specific language (DSL).
+The _smd_ language supports powerful variant handling, which allows to create a generic model and select specific instances of that model by creating configurations from predefined feature sets. In order to use this technology, features have to be referenced from various spots inside the model. All of those features have to be defined in a _feature model_, which is defined in a _fmd_-file. _fmd_ is a separate domain-specific language (DSL).
 
-In each _hbsim_ model file which needs to reference features from a feature model, this feature model has to be referenced by a @ref@ statement, which is located between the list of @import@-statements and the remainder of the file. Example:
+In each _smd_ model file which needs to reference features from a feature model, this feature model has to be referenced by a @ref@ statement, which is located between the list of @import@-statements and the remainder of the file. Example:
 
 bc. // reference feature model of product variants
 ref ProductVariantsModel;
 
-Note that in order to reference the feature model, an @import@-statement should have been given earlier which imports the corresponding _hbfm_-file which defines the feature model.
+Note that in order to reference the feature model, an @import@-statement should have been given earlier which imports the corresponding _fmd_-file which defines the feature model.
 
 h3. Model object definitions
 
-The next section of the _hbsim_-file contains a list of model element definitions in arbitrary order. E.g., these include variable definitions, CPUs, controllers, resources, functional blocks, use cases and many more. The definition of these model elements is described in the remainder of this chapter.
+The next section of the _smd_-file contains a list of model element definitions in arbitrary order. E.g., these include variable definitions, CPUs, controllers, resources, functional blocks, use cases and many more. The definition of these model elements is described in the remainder of this chapter.
 
 h3. Configurations and main section
 
@@ -80,18 +80,18 @@ In the last section, zero or more _configurations_ can be specified. A _configur
 
 A detailed description of feature models and configurations will be given later in this document (cf. section +Features, feature selectors and configurations+).
 
-Finally, a _hbsim_-file may contain a @main@-section, which instantiates a concrete model from various model elements. The @main@-section will be explained in more detail in chapter +Main section+ later in this document.
+Finally, a _smd_-file may contain a @main@-section, which instantiates a concrete model from various model elements. The @main@-section will be explained in more detail in chapter +Main section+ later in this document.
 
 
 h2. Features, feature selectors and configurations
 
-This section describes the _feature layer_ of _hbsim_ models in some detail.
+This section describes the _feature layer_ of _smd_ models in some detail.
 
 h3. Feature model definition
 
-A _feature model_ is a compact definition of features, their relationships and interdependencies. For _hbsim_ models, various model elements (and language constructs) can be defined as dependent on features of a central feature model. The feature model will be defined in a separate file in _hbfm_ format.
+A _feature model_ is a compact definition of features, their relationships and interdependencies. For _smd_ models, various model elements (and language constructs) can be defined as dependent on features of a central feature model. The feature model will be defined in a separate file in _fmd_ format.
 
-A _hbfm_ file will contain one single instance of a @feature_model@ element. The syntax is defined by
+A _fmd_ file will contain one single instance of a @feature_model@ element. The syntax is defined by
 
 pre. FeatureModel:
   'feature_model' IDENT '{'
@@ -124,7 +124,7 @@ h3. Feature configuration
 
 A _feature configuration_ selects a consistent set of features from a feature model. For each feature model, a possibly large set of configurations may be selected. Example: Many car manufacturers offer _car configurators_ on their website, where customers may configure the car of their dreams by selecting various variants, options and add-ons in an easy-to-use web interface.
 
-In _hbsim_ models, configurations can be defined with the @configuration@ keyword. Each configuration might be derived from a base configuration, which offers a simple inheritance mechanism. Features can be added to or removed from a configuration with the plus- and minus-sign, respectively. Here is an example based on the above feature model:
+In _smd_ models, configurations can be defined with the @configuration@ keyword. Each configuration might be derived from a base configuration, which offers a simple inheritance mechanism. Features can be added to or removed from a configuration with the plus- and minus-sign, respectively. Here is an example based on the above feature model:
 
 bc.. configuration MyBaseConfig {
   +HeadUnit
@@ -157,7 +157,7 @@ Note: Currently, there is no complete consistency checking of feature selectors 
 
 h2. Constant definitions
 
-In _hbsim_, named constants can be defined using the @set@ keyword. Example:
+In _smd_, named constants can be defined using the @set@ keyword. Example:
 
 bc. set CPU_CLOCK_RATE = 1300 * 0.8;
 
@@ -176,7 +176,7 @@ This section describes the model elements which are part of the _resource layer_
 
 h3. Controllers and CPUs
 
-CPUs are the basic building blocks of the resource layer in each _hbsim_ model. Functional blocks will be executed on one of the CPUs defined in the model. The actual mapping of functional blocks on CPUs is defined by a _partitioning_.
+CPUs are the basic building blocks of the resource layer in each _smd_ model. Functional blocks will be executed on one of the CPUs defined in the model. The actual mapping of functional blocks on CPUs is defined by a _partitioning_.
 
 h4. Simple CPU definition
 
@@ -222,7 +222,7 @@ p. The actual tag can be chosen freely (but has to adhere to the identifier synt
 
 h4. Specification of scheduling aspects
 
-There are some optional _hbsim_ elements which are used to specify scheduling aspects for a CPU definition. Currently, either plain schedulers or adaptive-partitioning schedulers are supported (see QNX APS to get more information on this). Scheduling is specified using the optional @scheduling@ keyword. Here is a simple example:
+There are some optional _smd_ elements which are used to specify scheduling aspects for a CPU definition. Currently, either plain schedulers or adaptive-partitioning schedulers are supported (see QNX APS to get more information on this). Scheduling is specified using the optional @scheduling@ keyword. Here is a simple example:
 
 bc.. cpu SomeCPU {
   cores 1;
@@ -250,7 +250,7 @@ There are two kinds of resources which can be accessed by functional blocks:
 
 h4. Bandwidth-restricted resources
 
-Bandwidth-restricted resources are defined by the _hbsim_ element @resource@. Aside from the resource's name, there are some mandatory configuration attributes and one or more @interface@ definitions. Consider the following example:
+Bandwidth-restricted resources are defined by the _smd_ element @resource@. Aside from the resource's name, there are some mandatory configuration attributes and one or more @interface@ definitions. Consider the following example:
 
 bc.. resource SomeResource {
   short Res1;
@@ -284,7 +284,7 @@ Currently, access to the resource does not distinguish read and write operations
 
 h4. Allocator-style resources
 
-Allocator-style resources are defined by the _hbsim_ element @pool@. A _pool_ contains a discrete number of entities (e.g., memory pages, communication channels), which can be allocated or freed by functional blocks. The following example shows the syntax of @pool@ definitions:
+Allocator-style resources are defined by the _smd_ element @pool@. A _pool_ contains a discrete number of entities (e.g., memory pages, communication channels), which can be allocated or freed by functional blocks. The following example shows the syntax of @pool@ definitions:
 
 bc.. pool SomePool {
   unit = "MB";
@@ -301,7 +301,7 @@ h2. Functional layer
 
 h3. Simple functional blocks and behaviors
 
-A _functional block_ in _hbsim_ is an entity with defined runtime behavior. It can be regarded as an abstraction of a modular piece of software ranging from single software components up to complete subsystems. The definition of a functional block starts with the keyword @fb@, followed by the block's name.
+A _functional block_ in _smd_ is an entity with defined runtime behavior. It can be regarded as an abstraction of a modular piece of software ranging from single software components up to complete subsystems. The definition of a functional block starts with the keyword @fb@, followed by the block's name.
 
 Each functional block has to define at least one _behaviour_, which is a step-by-step description of the functional block's execution behavior in a certain use case or scenario. Each behavior definition is indicated by the keyword @on@, followed by the behavior's name. Each behavior consists of a series of _steps_ (which might be empty).
 
@@ -338,7 +338,7 @@ The @use@-action offers some more options, which will be described in the follow
 
 h4. Automatic transformation of CPU-times between CPUs
 
-By default the parameter for @use@ gives the computed time in milliseconds based on the local CPU. If the time has been measured on a different platform than the platform where the functional block is currently running, _hbsim_ offers a facility to transform the computed time between platforms. The @use@ statement might refer to another @cpu@-entity to indicate that the timing is given related to this entity by using the @on@ keyword:
+By default the parameter for @use@ gives the computed time in milliseconds based on the local CPU. If the time has been measured on a different platform than the platform where the functional block is currently running, _smd_ offers a facility to transform the computed time between platforms. The @use@ statement might refer to another @cpu@-entity to indicate that the timing is given related to this entity by using the @on@ keyword:
 
 bc. use 500 on ARM9
 
