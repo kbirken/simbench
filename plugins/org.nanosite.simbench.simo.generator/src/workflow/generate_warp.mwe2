@@ -2,7 +2,7 @@ module workflow.generate_warp
 
 import org.eclipse.emf.mwe.utils.*
 
-var modelPath  // = "platform:/resource/com.harman.sys.interplay.viz.dot/src/com/harman/sys/interplay/viz/dot/generator/model.interplay"
+var modelPath  // = "platform:/resource/org.nanosite.sys.interplay.viz.dot/src/org/nanosite/sys/interplay/viz/dot/generator/model.interplay"
 var srcGenPathRel
 var srcGenPathAbs
 
@@ -19,11 +19,11 @@ Workflow {
 	//  - register the Interplay Model
 	bean = StandaloneSetup {
 		platformUri = ".."
-		registerGeneratedEPackage = "com.harman.simbench.HbsimStandaloneSetup"
-		registerGeneratedEPackage = "com.harman.feamo.HbfmStandaloneSetup"
+		registerGeneratedEPackage = "org.nanosite.simbench.simo.SimModelStandaloneSetup"
+		registerGeneratedEPackage = "org.nanosite.feamo.FeaMoStandaloneSetup"
 	}
 	
-	// read in the hbsim model
+	// read in the smd model
 	component = org.eclipse.emf.mwe.utils.Reader {
 		uri = modelPath
 		modelSlot = inputSlot

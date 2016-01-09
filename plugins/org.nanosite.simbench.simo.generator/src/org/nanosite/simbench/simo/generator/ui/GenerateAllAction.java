@@ -1,10 +1,9 @@
-package org.nanosite.simbench.hbsim.generator.ui;
+package org.nanosite.simbench.simo.generator.ui;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.ui.console.MessageConsoleStream;
-
 import org.nanosite.common.util.graphviz.GraphvizWrapper;
 
 public class GenerateAllAction extends GenericGenerateAction {

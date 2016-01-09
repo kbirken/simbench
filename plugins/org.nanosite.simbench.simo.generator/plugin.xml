@@ -6,23 +6,23 @@
          point="org.eclipse.ui.popupMenus">
       <objectContribution
             objectClass="org.eclipse.core.resources.IFile"
-            nameFilter="*.hbsim"
-            id="org.nanosite.simbench.hbsim.generator.contribution1">
+            nameFilter="*.smd"
+            id="org.nanosite.simbench.simo.generator.contribution1">
          <action
                label="Generate visuals and reports"
                icon="icons/Button-Refresh-icon16.png"
-               class="org.nanosite.simbench.hbsim.generator.ui.GenerateAllAction"
-               menubarPath="org.nanosite.simbench.ide.hbsimMenu/groupSIMBENCH"
+               class="org.nanosite.simbench.simo.generator.ui.GenerateAllAction"
+               menubarPath="org.nanosite.simbench.ide.simoMenu/groupSIMBENCH"
                enablesFor="1"
-               id="org.nanosite.simbench.hbsim.generator.genAllAction">
+               id="org.nanosite.simbench.simo.generator.genAllAction">
          </action>
          <action
                label="Generate chronSIM code (w/o simulation)"
                icon="icons/Button-Refresh-icon16.png"
-               class="org.nanosite.simbench.hbsim.generator.ui.GenerateChronsimAction"
-               menubarPath="org.nanosite.simbench.ide.hbsimMenu/groupChronsim"
+               class="org.nanosite.simbench.simo.generator.ui.GenerateChronsimAction"
+               menubarPath="org.nanosite.simbench.ide.simoMenu/groupChronsim"
                enablesFor="1"
-               id="org.nanosite.simbench.hbsim.generator.genChronsimAction">
+               id="org.nanosite.simbench.simo.generator.genChronsimAction">
          </action>
       </objectContribution>
    </extension>

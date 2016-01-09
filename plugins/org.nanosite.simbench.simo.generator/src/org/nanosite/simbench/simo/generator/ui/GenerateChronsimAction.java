@@ -1,14 +1,11 @@
-package org.nanosite.simbench.hbsim.generator.ui;
+package org.nanosite.simbench.simo.generator.ui;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.console.MessageConsoleStream;
-
 import org.nanosite.common.util.file.FileUtils;
-import org.nanosite.simbench.hbsim.generator.ui.GeneratorRunner;
-import org.nanosite.simbench.hbsim.generator.ui.GenericGenerateAction;
 
 public class GenerateChronsimAction extends GenericGenerateAction {
 

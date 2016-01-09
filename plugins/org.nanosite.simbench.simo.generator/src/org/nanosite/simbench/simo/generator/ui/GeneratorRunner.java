@@ -1,4 +1,4 @@
-package org.nanosite.simbench.hbsim.generator.ui;
+package org.nanosite.simbench.simo.generator.ui;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;

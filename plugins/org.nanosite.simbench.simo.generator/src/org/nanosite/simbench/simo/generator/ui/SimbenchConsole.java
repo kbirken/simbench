@@ -1,4 +1,4 @@
-package org.nanosite.simbench.hbsim.generator.ui;
+package org.nanosite.simbench.simo.generator.ui;
 
 import org.eclipse.swt.widgets.Shell;
 
