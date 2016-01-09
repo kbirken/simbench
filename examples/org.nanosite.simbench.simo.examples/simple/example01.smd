@@ -1,7 +1,7 @@
 /*
  * example01:
  *        - single CPU
- *        - one function block, which two chained behaviours 
+ *        - one function block, which two chained behaviors 
  *
  * 2010-06-07, kbirken: initial version 
  */
@@ -34,7 +34,7 @@ fb FB1 {
 	
 	on go() {
 		long_step {
-			use 4990;
+			use 4990 on CPU1;
 		}
 		short_step {
 			use 10;
