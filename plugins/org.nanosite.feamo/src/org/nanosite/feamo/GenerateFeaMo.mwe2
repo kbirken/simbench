@@ -2,6 +2,7 @@ module org.nanosite.feamo.GenerateFeaMo
 
 import org.eclipse.xtext.xtext.generator.*
 import org.eclipse.xtext.xtext.generator.model.project.*
+import org.eclipse.xtext.xtext.generator.exporting.*
 
 var rootPath = ".."
 
@@ -31,6 +32,9 @@ Workflow {
 		language = StandardLanguage {
 			name = "org.nanosite.feamo.FeaMo"
 			fileExtensions = "fmd"
+
+			// ensure that exported EObjects are referenced by their simple name (not FQN)
+			fragment = SimpleNamesFragment2 { }
 
 			serializer = {
 				generateStub = false
