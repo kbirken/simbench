@@ -1,10 +1,24 @@
 /*
- * Test01:
+ * example01:
  *        - single CPU
- *        - one function block, which two chained behaviours
+ *        - one function block, which two chained behaviours 
  *
- * 2010-06-07, kbirken: initial version
+ * 2010-06-07, kbirken: initial version 
  */
+
+// ***********************************************************************
+
+import "example01.fmd";
+
+//ref Example01Variants;
+
+// ***********************************************************************
+
+// EXPECTED RESULTS
+
+// FB1.sync @ 5000
+// FB1.concurrent @ 10000
+
 
 // ***********************************************************************
 
@@ -16,8 +30,8 @@ cpu CPU1 {
 // ***********************************************************************
 
 fb FB1 {
-	"Simple function block with chained behaviours.";
-
+	"Simple function block with chained behaviors.";
+	
 	on go() {
 		long_step {
 			use 4990;
@@ -27,7 +41,7 @@ fb FB1 {
 		}
 		send FB1.continue();
 	}
-
+	
 	on continue() {
 		step1 {
 			use 10;
@@ -56,18 +70,19 @@ usecase UC1 {
 scenario Test {
 	UC1;
 }
-
+ 
 
 // ***********************************************************************
 
-configuration None {
+configuration Simple {
+	+P1
 }
 
 
 main {
 	partitioning Standard;
 	scenario Test;
-	configuration None;
+	configuration Simple;
 }
 
 
