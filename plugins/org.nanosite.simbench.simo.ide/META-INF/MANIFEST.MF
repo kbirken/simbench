@@ -9,3 +9,6 @@ Require-Bundle: org.nanosite.simbench.simo,
  org.eclipse.xtext.ide,
  org.eclipse.xtext.xbase.ide
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: org.nanosite.simbench.simo.ide.contentassist.antlr,
+ org.nanosite.simbench.simo.ide.contentassist.antlr.internal
+

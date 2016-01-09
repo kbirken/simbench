@@ -7,5 +7,24 @@ Bundle-SymbolicName: org.nanosite.simbench.simo; singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.xtext,
  org.eclipse.xtext.xbase,
- org.eclipse.equinox.common;bundle-version="3.5.0"
+ org.eclipse.equinox.common;bundle-version="3.5.0",
+ org.nanosite.feamo;bundle-version="0.7.0",
+ org.eclipse.emf.ecore,
+ org.eclipse.xtext.util,
+ org.antlr.runtime,
+ org.eclipse.xtend.lib,
+ org.eclipse.emf.common,
+ org.eclipse.xtext.xbase.lib
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: org.nanosite.simbench.simo.parser.antlr,
+ org.nanosite.simbench.simo.scoping,
+ org.nanosite.simbench.simo.validation,
+ org.nanosite.simbench.simo.simModel.util,
+ org.nanosite.simbench.simo.generator,
+ org.nanosite.simbench.simo.simModel.impl,
+ org.nanosite.simbench.simo.serializer,
+ org.nanosite.simbench.simo.simModel,
+ org.nanosite.simbench.simo.services,
+ org.nanosite.simbench.simo.parser.antlr.internal,
+ org.nanosite.simbench.simo
+Import-Package: org.apache.log4j

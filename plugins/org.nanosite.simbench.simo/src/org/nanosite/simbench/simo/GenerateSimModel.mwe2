@@ -2,6 +2,8 @@ module org.nanosite.simbench.simo.GenerateSimModel
 
 import org.eclipse.xtext.xtext.generator.*
 import org.eclipse.xtext.xtext.generator.model.project.*
+import org.eclipse.xtext.xtext.generator.exporting.*
+//import org.eclipse.xtext.generator.*
 
 var rootPath = ".."
 
@@ -32,6 +34,10 @@ Workflow {
 			name = "org.nanosite.simbench.simo.SimModel"
 			fileExtensions = "smd"
 
+			referencedResource="platform:/resource/org.nanosite.feamo/model/generated/FeaMo.genmodel"
+			
+			fragment = SimpleNamesFragment2 { }
+			
 			serializer = {
 				generateStub = false
 			}

@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="simModel" nsURI="http://www.nanosite.org/simbench/simo/SimModel"
+    nsPrefix="simModel">
+  <eClassifiers xsi:type="ecore:EClass" name="Model">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="imports" upperBound="-1"
+        eType="#//Import" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fm" eType="ecore:EClass platform:/resource/org.nanosite.feamo/model/generated/FeaMo.ecore#//FeatureModel"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="vp_elements" upperBound="-1"
+        eType="#//VP_Element" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="configs" upperBound="-1"
+        eType="#//FeatureConfig" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="main" eType="#//Main" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Import">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="importURI" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="VP_Option">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sel" eType="#//FSelector"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="VP_Optional"/>
+  <eClassifiers xsi:type="ecore:EClass" name="VP_Selector">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sel" upperBound="-1" eType="#//FSelector"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="VP_Selectable"/>
+  <eClassifiers xsi:type="ecore:EClass" name="VP_Element" eSuperTypes="#//VP_Option">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="opt" eType="#//Element"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Element" eSuperTypes="#//VP_Optional">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="VariableDef" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="rhs" eType="#//VP_Expr"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CPU" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="cores" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="machine" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="factor" eType="#//VP_Expr"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="scheduling" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="partition" upperBound="-1"
+        eType="#//Partition" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Partition">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="percentage" eType="#//VP_Expr"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Resource" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="shortName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="unit" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="blocksize" eType="#//VP_Expr"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="interface" upperBound="-1"
+        eType="#//ResourceInterface" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ResourceInterface">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="bandwidth" eType="#//VP_Expr"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="inducedCPU" eType="#//VP_Expr"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="contextSwitchingTime" eType="#//VP_Expr"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ResourceInterfaceRef">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="resource" eType="#//Resource"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="interface" eType="#//ResourceInterface"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Pool" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="unit" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="maximum" eType="#//VP_Expr"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FunctionBlock" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="description" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="processes" upperBound="-1"
+        eType="#//Process" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="behaviour" upperBound="-1"
+        eType="#//Behaviour" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Process">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="argsMatch" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="threads" upperBound="-1"
+        eType="#//Thread" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Thread">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Behaviour">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="taskgroup" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="repeat" eType="#//BehaviourRepeat"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="token" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="marker_set" eType="#//MarkerSet"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="plan" eType="#//Plan" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="send" upperBound="-1" eType="#//VP_TriggerCall"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BehaviourRepeat">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="loop" eType="#//Expr" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="until" eType="#//StopTriggerDef"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="unless" eType="#//StepRef"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Plan">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="step" upperBound="-1" eType="#//Step"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="StopTriggerDef">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="VP_TriggerCall" eSuperTypes="#//VP_Selector">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="must" eType="#//TriggerCall"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="alt" upperBound="-1" eType="#//TriggerCall"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TriggerCall" eSuperTypes="#//VP_Selectable">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fb" eType="#//FunctionBlock"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="trigger" eType="#//Behaviour"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Step">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="provides" eType="#//Resource"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="milestone" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="precondition" upperBound="-1"
+        eType="#//Precondition" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="action" upperBound="-1"
+        eType="#//Action" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="marker_set" eType="#//MarkerSet"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Precondition">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="opt" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ref" eType="#//VP_StepRef"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="VP_StepRef" eSuperTypes="#//VP_Selector">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="must" eType="#//StepRef"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="alt" upperBound="-1" eType="#//StepRef"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="StepRef" eSuperTypes="#//VP_Selectable">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fb" eType="#//FunctionBlock"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="step" eType="#//Step"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Action">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="consumedCPU" eType="#//VP_Expr"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cpu" eType="#//CPU"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxpar" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="additionalWaitTime" eType="#//VP_Expr"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="io" upperBound="-1" eType="#//VP_IOActivity"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="VP_IOActivity" eSuperTypes="#//VP_Option">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="opt" eType="#//IOActivity"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="IOActivity" eSuperTypes="#//VP_Optional">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="op" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="content" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="amount" eType="#//VP_Expr"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ioInterface" eType="#//ResourceInterfaceRef"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="pool" eType="#//Pool"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="MarkerSet">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="marker" upperBound="-1"
+        eType="#//Marker" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Marker">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" eType="#//MarkerType"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="param" unique="false" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="MarkerType">
+    <eLiterals name="SlogMatch" literal="SlogMatch"/>
+    <eLiterals name="TraceStart" value="1" literal="TraceStart"/>
+    <eLiterals name="AllProcessesStarted" value="2" literal="AllProcessesStarted"/>
+    <eLiterals name="ProvidesDevice" value="3" literal="ProvidesDevice"/>
+    <eLiterals name="ProvidesServiceInterface" value="4" literal="ProvidesServiceInterface"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Partitioning" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="base" eType="#//Partitioning"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="mapping" upperBound="-1"
+        eType="#//VP_Mapping" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="VP_Mapping" eSuperTypes="#//VP_Option">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="opt" eType="#//Mapping"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Mapping" eSuperTypes="#//VP_Optional">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fb" eType="#//FunctionBlock"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cpu" eType="#//CPU"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="partition" eType="#//Partition"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="UseCase" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="part" upperBound="-1" eType="#//VP_TriggerCall"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Scenario" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="usecase" unique="false"
+        upperBound="-1" eType="#//UseCase"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Main">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="partitioning" eType="#//Partitioning"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="scenario" eType="#//Scenario"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="config" eType="#//FeatureConfig"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="VP_Expr" eSuperTypes="#//VP_Selector">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="must" eType="#//Expr" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="alt" upperBound="-1" eType="#//Expr"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Expr" eSuperTypes="#//VP_Selectable #//AtomicExpr"/>
+  <eClassifiers xsi:type="ecore:EClass" name="AddExpr" eSuperTypes="#//Expr">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="term" upperBound="-1" eType="#//MultExpr"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="op" unique="false" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="MultExpr">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="factor" upperBound="-1"
+        eType="#//AtomicExpr" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="op" unique="false" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AtomicExpr">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="var" eType="#//VariableDef"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FSelector">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="expr" eType="#//FSelExpr"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FSelExpr" eSuperTypes="#//FSelAtomicExpr"/>
+  <eClassifiers xsi:type="ecore:EClass" name="FSelOrExpr" eSuperTypes="#//FSelExpr">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="term" upperBound="-1" eType="#//FSelAndExpr"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FSelAndExpr">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="factor" upperBound="-1"
+        eType="#//FSelAtomicExpr" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FSelAtomicExpr">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="neg" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="feature" eType="ecore:EClass platform:/resource/org.nanosite.feamo/model/generated/FeaMo.ecore#//Feature"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FeatureConfig">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="base" eType="#//FeatureConfig"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="plus" unique="false" upperBound="-1"
+        eType="ecore:EClass platform:/resource/org.nanosite.feamo/model/generated/FeaMo.ecore#//Feature"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="minus" unique="false" upperBound="-1"
+        eType="ecore:EClass platform:/resource/org.nanosite.feamo/model/generated/FeaMo.ecore#//Feature"/>
+  </eClassifiers>
+</ecore:EPackage>
