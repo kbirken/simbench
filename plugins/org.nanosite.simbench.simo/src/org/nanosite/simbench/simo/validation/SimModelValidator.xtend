@@ -103,10 +103,13 @@ class SimModelValidator extends AbstractSimModelValidator {
 							if (! behaviors.contains(precondStep.getBehaviour)) {
 								val sFullName = s.fullName
 								val pFullName = precondStep.fullName
+//								error("Precondition " + pFullName + " is unreachable from step " + sFullName,
+//										s, SimModelPackage.Literals.STEP__NAME, -1)
+//								error("Precondition " + pFullName + " is unreachable from step " + sFullName,
+//										precondStep, SimModelPackage.Literals.STEP__NAME, -1);
+								// WORKAROUND: cannot report error for another resource
 								error("Precondition " + pFullName + " is unreachable from step " + sFullName,
-										s, SimModelPackage.Literals.STEP__NAME, -1)
-								error("Precondition " + pFullName + " is unreachable from step " + sFullName,
-										precondStep, SimModelPackage.Literals.STEP__NAME, -1);
+										model.main, SimModelPackage.Literals.MAIN__CONFIG, -1)
 							}
 						}
 					}
