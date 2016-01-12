@@ -11,6 +11,8 @@ import org.nanosite.simbench.simo.simModel.FSelOrExpr
 import org.nanosite.simbench.simo.simModel.FSelector
 import org.nanosite.simbench.simo.simModel.FeatureConfig
 
+import static extension org.nanosite.simbench.simo.ListExtensions.*
+
 /**
  * Helper methods for easy implementation of variation points in derived models
  */
@@ -66,7 +68,7 @@ class FeatureSelectionHelper {
 			if (list.head.matches(cfg))
 				true
 			else
-				list.subList(1, list.size).matches_or(cfg)
+				list.withoutFirst.matches_or(cfg)
 		}
 	}
 	
@@ -79,7 +81,7 @@ class FeatureSelectionHelper {
 			true
 		else {
 			if (list.head.matches(cfg))
-				list.subList(1, list.size).matches_and(cfg)
+				list.withoutFirst.matches_and(cfg)
 			else
 				false
 		}

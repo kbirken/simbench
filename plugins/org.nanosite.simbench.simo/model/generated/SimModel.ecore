@@ -225,21 +225,11 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="alt" upperBound="-1" eType="#//Expr"
         containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Expr" eSuperTypes="#//VP_Selectable #//AtomicExpr"/>
-  <eClassifiers xsi:type="ecore:EClass" name="AddExpr" eSuperTypes="#//Expr">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="term" upperBound="-1" eType="#//MultExpr"
-        containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="op" unique="false" upperBound="-1"
-        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="MultExpr">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="factor" upperBound="-1"
-        eType="#//AtomicExpr" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="op" unique="false" upperBound="-1"
-        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="AtomicExpr">
+  <eClassifiers xsi:type="ecore:EClass" name="Expr" eSuperTypes="#//VP_Selectable"/>
+  <eClassifiers xsi:type="ecore:EClass" name="VariableRef" eSuperTypes="#//Expr">
     <eStructuralFeatures xsi:type="ecore:EReference" name="var" eType="#//VariableDef"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FloatConstant" eSuperTypes="#//Expr">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="FSelector">
@@ -266,5 +256,11 @@
         eType="ecore:EClass platform:/resource/org.nanosite.feamo/model/generated/FeaMo.ecore#//Feature"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="minus" unique="false" upperBound="-1"
         eType="ecore:EClass platform:/resource/org.nanosite.feamo/model/generated/FeaMo.ecore#//Feature"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BinaryExpr" eSuperTypes="#//Expr">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="left" eType="#//Expr" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="op" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="right" eType="#//Expr"
+        containment="true"/>
   </eClassifiers>
 </ecore:EPackage>

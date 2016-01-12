@@ -1,18 +1,21 @@
 package org.nanosite.simbench.simo.generator.ui;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.ParseException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.emf.mwe.core.WorkflowEngine;
-import org.eclipse.emf.mwe.core.issues.Issues;
-import org.eclipse.emf.mwe.core.issues.IssuesImpl;
-import org.eclipse.emf.mwe.core.monitor.ProgressMonitorAdapter;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.mwe2.language.Mwe2StandaloneSetup;
+import org.eclipse.emf.mwe2.launch.runtime.Mwe2Launcher;
+import org.eclipse.emf.mwe2.launch.runtime.Mwe2Runner;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.console.MessageConsoleStream;
+
+import com.google.inject.Injector;
 
 public class GeneratorRunner {
 
@@ -30,11 +33,11 @@ public class GeneratorRunner {
 	class MyRunnable implements IRunnableWithProgress {
 		String mweFile;
 		boolean ok = false;
-		Map<String,String> properties;
+		Map<String,String> params;
 
 		public MyRunnable (String mweFile, Map<String,String> properties) {
 			this.mweFile = mweFile;
-			this.properties = properties;
+			this.params = properties;
 		}
 
 		public void run (IProgressMonitor monitor)
@@ -43,28 +46,39 @@ public class GeneratorRunner {
 //			Mwe2Runner runner = new Mwe2Runner();
 //			runner.run("workflow.generate_warp", properties);
 			
-			WorkflowEngine runner = new WorkflowEngine();
-			boolean configOK = runner.prepare(mweFile, monitor==null ? null : new ProgressMonitorAdapter(monitor), properties);
-			if (!configOK) {
-				err.println("Error: Couldn't prepare workflow!");
-				ok = false;
-				return;
-			}
+			Injector injector = new Mwe2StandaloneSetup().createInjectorAndDoEMFRegistration();
+			Mwe2Runner runner = injector.getInstance(Mwe2Runner.class);
+			String classpath = System.getProperty("java.class.path") ;
+			System.out.println("classpath: " + classpath);
 
 			out.println("Running workflow " + mweFile + " ...");
-			out.println("Output directory: " + properties.get("srcGenPathAbs"));
-			final Issues issues = new IssuesImpl();
-	        final Map<String,String> slotContents = new HashMap<String,String>();
-			ok = runner.executeWorkflow(slotContents, issues);
-			for(int i=0; i<issues.getInfos().length; i++) {
-				out.println("Info: " + issues.getInfos()[i].toString());
+			out.println("Output directory: " + params.get("srcGenPathAbs"));
+//			final Issues issues = new IssuesImpl();
+//	        final Map<String,String> slotContents = new HashMap<String,String>();
+			try {
+				if (mweFile.contains("/")) {
+					runner.run(URI.createURI(mweFile), params);
+				} else {
+					runner.run(mweFile, params);
+				}
+				ok = true;
+			} catch (NoClassDefFoundError e) {
+				if ("org/eclipse/core/runtime/OperationCanceledException".equals(e.getMessage())){
+					System.err.println("Could not load class: org.eclipse.core.runtime.OperationCanceledException");
+					System.err.println("Add org.eclipse.equinox.common to the class path.");
+				} else {
+					throw e;
+				}
 			}
-			for(int i=0; i<issues.getIssues().length; i++) {
-				out.println("Issue: " + issues.getIssues()[i].toString());
-			}
-			out.println("Workflow ready - " +
-					issues.getErrors().length + " errors, " +
-					issues.getWarnings().length + " warnings.");
+//			for(int i=0; i<issues.getInfos().length; i++) {
+//				out.println("Info: " + issues.getInfos()[i].toString());
+//			}
+//			for(int i=0; i<issues.getIssues().length; i++) {
+//				out.println("Issue: " + issues.getIssues()[i].toString());
+//			}
+//			out.println("Workflow ready - " +
+//					issues.getErrors().length + " errors, " +
+//					issues.getWarnings().length + " warnings.");
 		}
 	}
 

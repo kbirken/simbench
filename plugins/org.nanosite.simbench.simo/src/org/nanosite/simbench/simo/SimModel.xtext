@@ -40,7 +40,7 @@ VP_Option:   VP_Element | VP_IOActivity | VP_Mapping;
 VP_Optional:   Element | IOActivity | Mapping;
 
 VP_Selector: VP_TriggerCall | VP_StepRef | VP_Expr;
-VP_Selectable: TriggerCall | StepRef | Expr;
+VP_Selectable: TriggerCall | StepRef | AddExpr;
 
 
 // *****************************************************************************
@@ -129,7 +129,7 @@ Behaviour :
 	'}';
 
 BehaviourRepeat :
-	('repeat' loop=Expr) |
+	('repeat' loop=AddExpr) |
 	('until' until=StopTriggerDef) |
 	('unless' unless=StepRef);
 
@@ -240,20 +240,27 @@ Main :
 // *****************************************************************************
 
 VP_Expr :
-	must=Expr |
-	(sel+=FSelector alt+=Expr)+ ;
+	must=AddExpr |
+	(sel+=FSelector alt+=AddExpr)+ ;
 
-Expr :
-	AddExpr;
+AddExpr returns Expr:
+	MultExpr
+	({BinaryExpr.left=current} op=('+'|'-') right=MultExpr)*;
 
-AddExpr :
-	term+=MultExpr (op+=('+'|'-') term+=MultExpr)*;
+MultExpr returns Expr:
+	AtomicExpr
+	({BinaryExpr.left=current} op=('*'|'/') right=AtomicExpr)*;
 
-MultExpr :
-	factor+=AtomicExpr (op+=('*'|'/') factor+=AtomicExpr)*;
-
-AtomicExpr :
-	var=[VariableDef|ID] | value=Float | '(' Expr ')';
+AtomicExpr returns Expr:
+	VariableRef |
+	FloatConstant |
+	'(' AddExpr ')';
+	
+VariableRef:
+	var=[VariableDef|ID];
+	
+FloatConstant:
+	value=Float; 
 
 //Float returns ecore::EDouble : INT ('.' INT)?;
 Float : INT ('.' INT)?;
