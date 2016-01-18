@@ -1,15 +1,20 @@
+/*******************************************************************************
+ * Copyright (c) 2016 itemis AG (http://www.itemis.de).
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *******************************************************************************/
 package org.nanosite.simbench.simo
 
-import java.util.List
 import org.nanosite.simbench.simo.simModel.BinaryExpr
 import org.nanosite.simbench.simo.simModel.Expr
 import org.nanosite.simbench.simo.simModel.FeatureConfig
+import org.nanosite.simbench.simo.simModel.FloatConstant
 import org.nanosite.simbench.simo.simModel.VP_Expr
+import org.nanosite.simbench.simo.simModel.VariableRef
 
 import static extension org.nanosite.simbench.simo.FeatureBinder.*
-import static extension org.nanosite.simbench.simo.ListExtensions.*
-import org.nanosite.simbench.simo.simModel.VariableRef
-import org.nanosite.simbench.simo.simModel.FloatConstant
 
 class ExpressionEvaluator {
 
