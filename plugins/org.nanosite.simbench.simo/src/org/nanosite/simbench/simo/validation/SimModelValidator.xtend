@@ -20,6 +20,7 @@ import org.nanosite.simbench.simo.simModel.SimModelPackage
 
 import static extension org.nanosite.simbench.simo.FeatureBinder.*
 import static extension org.nanosite.simbench.simo.ModelExtensions.*
+import org.nanosite.simbench.simo.simModel.FunctionBlock
 
 /**
  * This class contains custom validation rules. 
@@ -93,13 +94,16 @@ class SimModelValidator extends AbstractSimModelValidator {
 
 		val cfg = model.main.config
 		val behaviors = model.allReachableBehaviours 
+//		println("reachable behaviors: ")
 		for(bhvr : behaviors) {
 			if (bhvr.plan!=null) {
 				for(s : bhvr.plan.step) {
 					for(prec : s.precondition) {
+						// which step is referenced by this precondition? 
 						val stepRef = prec.ref.bind(cfg)
 						if (stepRef!=null) {
 							val precondStep = stepRef.step
+							// is the behavior of the referenced step among the reachable behaviors?
 							if (! behaviors.contains(precondStep.getBehaviour)) {
 								val sFullName = s.fullName
 								val pFullName = precondStep.fullName
@@ -115,7 +119,7 @@ class SimModelValidator extends AbstractSimModelValidator {
 					}
 				}
 			}
-//			println("bhvr: " + bhvr.bhvr.name
+//			println("  " + (bhvr.eContainer as FunctionBlock).name + ":" + bhvr.name)
 		}
 
 //		Scenario scenario = model.getMain().getScenario()
@@ -124,6 +128,15 @@ class SimModelValidator extends AbstractSimModelValidator {
 //				TriggerCall tc = HbsimHelper.bind(vpTC, config)
 //			}
 //		}
+
+		val fbs = behaviors.map[getFB].toSet
+		for(fb : fbs) {
+			val mapping = fb.getMapping(model)
+			if (mapping==null) {
+				error("Missing cpu mapping for function block '" + fb.name + "'",
+						model.main, SimModelPackage.Literals.MAIN__PARTITIONING, -1)
+			}
+		}
 	}
 
 	

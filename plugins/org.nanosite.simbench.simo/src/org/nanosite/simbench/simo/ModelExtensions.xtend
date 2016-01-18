@@ -235,11 +235,11 @@ class ModelExtensions {
 	}
 	
 	def static CPU getCPU(FunctionBlock fb, Model model) {
-		fb.getMapping(model).cpu
+		fb.getMapping(model)?.cpu
 	}
 
 	def static Partition getPartition(FunctionBlock fb, Model model) {
-		fb.getMapping(model).partition
+		fb.getMapping(model)?.partition
 	}
 
 	def static Set<FunctionBlock> getAllFunctionBlocksOn(Model model, CPU cpu) {
