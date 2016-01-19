@@ -34,9 +34,9 @@ public class PreferencesPage extends FieldEditorPreferencePage implements
 
 	@Override
 	protected void createFieldEditors() {
-		addField(new DirectoryFieldEditor(GraphvizWrapper.ID_GRAPHVIZ_PATH, "Graphviz path:",
+		addField(new FileFieldEditor(GraphvizWrapper.ID_GRAPHVIZ_PATH, "Dot path:",
 	            getFieldEditorParent()));
-		addField(new FileFieldEditor(WarpRunner.ID_WARP_PATH, "warp path:",
+		addField(new FileFieldEditor(WarpRunner.ID_WARP_PATH, "Warp path:",
 	            getFieldEditorParent()));
 	}
 

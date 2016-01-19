@@ -63,8 +63,7 @@ public class GraphvizWrapper {
 	// ensure dot.exe tool is available
 	private static String getDotPath (MessageConsoleStream err) {
 		IPreferencesService service = Platform.getPreferencesService();
-		String graphvizDir = service.getString("org.nanosite.simbench.ide", ID_GRAPHVIZ_PATH, "", null);
-		String dotPath = graphvizDir + "/dot.exe";
+		String dotPath = service.getString("org.nanosite.simbench.ide", ID_GRAPHVIZ_PATH, "", null);
 
 		File dotFile = new File(dotPath);
 		if (! dotFile.exists()) {
