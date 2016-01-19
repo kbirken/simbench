@@ -59,7 +59,6 @@
       <import plugin="org.nanosite.systemmodel" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.nanosite.simbench.simo.generator" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.nanosite.simbench.warp" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.nanosite.simbench.chronsim" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.edit"/>
       <import plugin="org.eclipse.emf.ecore.xmi"/>
       <import plugin="org.eclipse.emf.edit.ui"/>
@@ -139,13 +138,6 @@
 
    <plugin
          id="org.nanosite.simbench.warp"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.nanosite.simbench.chronsim"
          download-size="0"
          install-size="0"
          version="0.0.0"

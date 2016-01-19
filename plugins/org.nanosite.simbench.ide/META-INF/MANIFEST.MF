@@ -9,7 +9,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.nanosite.simbench.simo.generator;bundle-version="0.7.0",
  org.nanosite.simbench.backend.warp;bundle-version="0.7.0",
- org.nanosite.simbench.backend.chronsim;bundle-version="0.7.0",
  org.nanosite.common.util;bundle-version="0.7.0",
  org.nanosite.systemmodel;bundle-version="0.7.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7

@@ -2,12 +2,12 @@ package org.nanosite.simbench.ide.preferences;
 
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-
 import org.nanosite.common.util.graphviz.GraphvizWrapper;
-import org.nanosite.simbench.backend.chronsim.ChronsimRunner;
+import org.nanosite.simbench.backend.warp.WarpRunner;
 import org.nanosite.simbench.ide.Activator;
 
 public class PreferencesPage extends FieldEditorPreferencePage implements
@@ -36,7 +36,7 @@ public class PreferencesPage extends FieldEditorPreferencePage implements
 	protected void createFieldEditors() {
 		addField(new DirectoryFieldEditor(GraphvizWrapper.ID_GRAPHVIZ_PATH, "Graphviz path:",
 	            getFieldEditorParent()));
-		addField(new DirectoryFieldEditor(ChronsimRunner.ID_CHRONSIM_PATH, "chronSIM path:",
+		addField(new FileFieldEditor(WarpRunner.ID_WARP_PATH, "warp path:",
 	            getFieldEditorParent()));
 	}
 

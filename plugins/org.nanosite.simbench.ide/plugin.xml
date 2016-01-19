@@ -37,9 +37,6 @@
             <separator
                   name="groupSIMBENCH">
             </separator>
-            <separator
-                  name="groupChronsim">
-            </separator>
          </menu>
          <action
                class="org.nanosite.simbench.ide.actions.DoWarpSimulationAction"
@@ -48,13 +45,6 @@
                label="Start warp simulation"
                icon="icons/Button-Play-icon16.png"
                menubarPath="org.nanosite.simbench.ide.simoMenu/groupSIMBENCH">
-         </action>
-         <action
-               class="org.nanosite.simbench.ide.actions.DoChronsimBatchSimulationAction"
-               enablesFor="1"
-               id="org.nanosite.simbench.ide.actions.chronsimBatchAction"
-               label="Start chronSIM simulation as batch"
-               menubarPath="org.nanosite.simbench.ide.simoMenu/groupChronsim">
          </action>
       </objectContribution>
    </extension>
