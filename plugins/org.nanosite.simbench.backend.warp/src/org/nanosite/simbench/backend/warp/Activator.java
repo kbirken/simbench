@@ -53,6 +53,7 @@ public class Activator extends AbstractUIPlugin {
 
 	public static boolean extractedToolsDir = false;
 
+	// TODO: Is this really used?
 	public static String getToolsDir() {
 		String tempDir = System.getProperty("java.io.tmpdir") + "simbench/tools";
 		if (extractedToolsDir) {
@@ -67,15 +68,15 @@ public class Activator extends AbstractUIPlugin {
 			return "";
 		}
 
-		ResourceExtractor ex = new ResourceExtractor(plugin);
-		if (! ex.extractResource("warp.exe", "tools", tempDir)) {
-			System.err.println(plugin.getBundle().getSymbolicName() + ": cannot copy file warp.exe!");
-			return "";
-		}
-		if (! ex.extractResource("cygwin1.dll", "tools", tempDir)) {
-			System.err.println(plugin.getBundle().getSymbolicName() + ": cannot copy file cygwin1.dll!");
-			return "";
-		}
+//		ResourceExtractor ex = new ResourceExtractor(plugin);
+//		if (! ex.extractResource("warp.exe", "tools", tempDir)) {
+//			System.err.println(plugin.getBundle().getSymbolicName() + ": cannot copy file warp.exe!");
+//			return "";
+//		}
+//		if (! ex.extractResource("cygwin1.dll", "tools", tempDir)) {
+//			System.err.println(plugin.getBundle().getSymbolicName() + ": cannot copy file cygwin1.dll!");
+//			return "";
+//		}
 
 		extractedToolsDir = true;
 		return tempDir;

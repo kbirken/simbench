@@ -3,9 +3,11 @@
  */
 package org.nanosite.simbench.simo.generator
 
+import java.util.List
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
+import org.eclipse.xtext.generator.IGenerator2
 import org.eclipse.xtext.generator.IGeneratorContext
 
 /**
@@ -15,11 +17,16 @@ import org.eclipse.xtext.generator.IGeneratorContext
  */
 class SimModelGenerator extends AbstractGenerator {
 
+	static List<IGenerator2> generators = newArrayList
+
+	def static addGenerator(IGenerator2 generator) {
+		println("SimModelGenerator: added " + generator)
+		generators.add(generator);
+	}
+
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-//		fsa.generateFile('greetings.txt', 'People to greet: ' + 
-//			resource.allContents
-//				.filter(typeof(Greeting))
-//				.map[name]
-//				.join(', '))
+		for(gen : generators) {
+			gen.doGenerate(resource, fsa, context)
+		}
 	}
 }

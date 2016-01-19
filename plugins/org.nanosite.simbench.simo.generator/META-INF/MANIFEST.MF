@@ -36,4 +36,5 @@ Import-Package: org.apache.log4j,
  org.eclipse.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: org.nanosite.simbench.simo.generator,
- org.nanosite.simbench.simo.generator.ui
+ org.nanosite.simbench.simo.generator.ui,
+ org.nanosite.simbench.simo.generator.warp

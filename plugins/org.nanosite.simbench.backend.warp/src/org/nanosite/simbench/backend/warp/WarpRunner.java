@@ -8,35 +8,43 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.ui.console.MessageConsoleStream;
 
 public class WarpRunner {
 
+	// the preferences key
+	public static String ID_WARP_PATH = "org.nanosite.simbench.ide.warp_path";
+		
 	private MessageConsoleStream out = null;
 	private MessageConsoleStream err = null;
+	
+	private String warpPath = null;
 
 	private String simuResultDotFile = "";
 
 	public WarpRunner(MessageConsoleStream out, MessageConsoleStream err) {
 		this.out = out;
 		this.err = err;
+
+		// get warp path from preferences
+		IPreferencesService service = Platform.getPreferencesService();
+		this.warpPath = service.getString("org.nanosite.simbench.ide", ID_WARP_PATH, "", null);
 	}
 
 	public boolean run (String warpModelFile, String traceDir) {
-		out("loading " + warpModelFile);
-
-		// ensure that warp.exe and other needed resources are available
-		String toolsDir = Activator.getToolsDir();
-		if (toolsDir.equals("")) {
-			err("could not find binary resources, aborting.");
+		if (warpPath==null) {
+			err("path to warp executable is not configured in preferences, skipping.");
 			return false;
 		}
+		
+		out("loading " + warpModelFile);
 
 		// ensure warp.exe tool is available
-		String warpExe = toolsDir + "/warp.exe";
-		File warp = new File(warpExe);
+		File warp = new File(warpPath);
 		if (! warp.exists()) {
-			err("warp.exe is not available (configured path: '" + warpExe + "').");
+			err("warp executable is not available (configured path: '" + warpPath + "').");
 			return false;
 		}
 
@@ -74,7 +82,7 @@ public class WarpRunner {
 		Process p = null;
 		try {
 			out("executing simulation ...");
-			String cmdline = warpExe + " -v3 -g " + simuResultDotFile + " " + warpModelFile;
+			String cmdline = warpPath + " -v3 -g " + simuResultDotFile + " " + warpModelFile;
 			p = Runtime.getRuntime().exec(cmdline);
 
 			// redirect output to trace file
@@ -87,6 +95,7 @@ public class WarpRunner {
 				bos.newLine();
 			}
 			bos.flush();
+			bos.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

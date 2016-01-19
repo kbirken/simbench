@@ -9,27 +9,28 @@ package org.nanosite.simbench.simo.generator.warp
 
 import com.google.common.collect.Sets
 import java.util.List
+import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
+import org.nanosite.simbench.simo.simModel.Action
 import org.nanosite.simbench.simo.simModel.Behaviour
+import org.nanosite.simbench.simo.simModel.BehaviourRepeat
+import org.nanosite.simbench.simo.simModel.CPU
 import org.nanosite.simbench.simo.simModel.FeatureConfig
 import org.nanosite.simbench.simo.simModel.FunctionBlock
+import org.nanosite.simbench.simo.simModel.IOActivity
 import org.nanosite.simbench.simo.simModel.Model
+import org.nanosite.simbench.simo.simModel.Pool
+import org.nanosite.simbench.simo.simModel.ResourceInterface
 import org.nanosite.simbench.simo.simModel.Step
 import org.nanosite.simbench.simo.simModel.VP_Expr
 
 import static extension org.nanosite.simbench.simo.ExpressionEvaluator.*
 import static extension org.nanosite.simbench.simo.FeatureBinder.*
-import static extension org.nanosite.simbench.simo.ModelExtensions.*
 import static extension org.nanosite.simbench.simo.ListExtensions.*
-import org.nanosite.simbench.simo.simModel.IOActivity
-import org.nanosite.simbench.simo.simModel.ResourceInterface
-import org.nanosite.simbench.simo.simModel.Action
-import org.nanosite.simbench.simo.simModel.CPU
-import org.nanosite.simbench.simo.simModel.Pool
-import org.nanosite.simbench.simo.simModel.BehaviourRepeat
+import static extension org.nanosite.simbench.simo.ModelExtensions.*
 
 /**
  * This is a generator for warp input files in "condensed" ASCII format.
@@ -52,8 +53,42 @@ class WarpGenerator extends AbstractGenerator {
 		IGeneratorContext context
 	) {
 		val firstModel = resource.allContents.filter(Model).head
-		if (firstModel?.main != null)
-			fsa.generateFile("example_warp.txt", generateAll(firstModel))
+		if (firstModel?.main != null) {
+			val filename = getRelativeGenPath(resource)
+			if (filename!=null) {
+				fsa.generateFile(filename, generateAll(firstModel))
+				println("WarpGenerator: Generated warp file for " + resource.URI.toString)
+			} else {
+				println("WarpGenerator: Expected platform resource (was: " + resource.URI.toString + ")")
+			}
+		} else {
+			//println("WarpGenerator: ignoring   " + resource.URI.toString)
+		}
+	}
+	
+	def static String getRelativeGenPath(Resource resource) {
+		if (resource.URI.isPlatformResource) {
+			val workspaceRelative = resource.URI.toPlatformString(false).substring(1)
+			return workspaceRelative.relativeGenPath
+		}
+		null
+	}
+
+	/**
+	 * Compute path and filename for generated file.
+	 * 
+	 * @param workspaceRelative the path for the input model file relative to the
+	 *                          workspace without leading "/" (starts with project name) 
+	 */
+	def static String getRelativeGenPath(String workspaceRelative) {
+		// remove project name from beginning of path
+		val idx = workspaceRelative.indexOf("/")
+		if (idx>0) {
+			val projectRelative = workspaceRelative.substring(idx+1)
+			projectRelative.replace(".smd", "_warp.txt")
+		} else {
+			null
+		}
 	}
 	
 	def private generateAll(Model it) {
